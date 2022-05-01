@@ -30,4 +30,4 @@ LINK:
 	$(CC) -o $(BIN_DIR)/$(BIN) $(OBJS)
 
 clean:
-	rm $(OBJS) $(BIN_DIR)/$(BIN)
+	rm -f $(OBJS) $(BIN_DIR)/$(BIN)

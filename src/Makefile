@@ -1,5 +1,5 @@
 # 读取当前目录, 当目录为 include 时不进入其中递归
-SUBDIRS = $(shell ls -l | grep ^d | awk '{if($$9 ! =  "include") print $$9}')
+SUBDIRS = $(shell ls -l | grep ^d | awk '{if($$9 !=  "include") print $$9}')
 # 拿到当前目录下的所有 .c 文件
 CUR_SOURCE = ${wildcard *.c}
 # 拿到目标 .o 文件名
