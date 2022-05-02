@@ -1,7 +1,6 @@
 #include "head.h"
 #include "program_init.h"
 
-// 读取配置文件前, 获取配置文件目录
 int getconfig_init(char *dir, int dirlen) {
     int ret = 0;
     // 如果使用 getcwd, 则获取到的为工作目录, 在不同目录下启动程序会导致工作目录不一致.
@@ -23,8 +22,7 @@ int getconfig_init(char *dir, int dirlen) {
     return ret + 7;
 }
 
-// 读取配置文件
-int getconfig(char *config_dir, char *filename, char config[][MAX_CONFIG_LENGTH]) {
+int getconfig(const char *config_dir, const char *filename, char config[][MAX_CONFIG_LENGTH]) {
     int ret = 0;
     char fullname[1024] = {0};
     sprintf(fullname, "%s%s", config_dir, filename); // 由 config 目录绝对路径与配置文件名拼接得到配置文件绝对路径

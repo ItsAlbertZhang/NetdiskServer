@@ -14,7 +14,7 @@ ROOT_DIR = $(shell pwd)
 # 编译选项
 CFLAGS = -I $(ROOT_DIR)/$(SRC_DIR)/include
 # 链接选项
-LFLAGS = -lpthread
+LFLAGS = -lpthread -lcrypto
 
 # 获取目标文件
 OBJS = ${wildcard $(OBJS_DIR)/*.o}
@@ -27,7 +27,7 @@ COMP:
 	@make -C $(SRC_DIR) --no-print-directory
 # 链接目标文件, 生成二进制可执行文件
 LINK:
-	$(CC) -o $(BIN_DIR)/$(BIN) $(OBJS)
+	$(CC) -o $(BIN_DIR)/$(BIN) $(OBJS) $(LFLAGS)
 
 clean:
 	rm -f $(OBJS) $(BIN_DIR)/$(BIN)

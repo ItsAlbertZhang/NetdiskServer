@@ -1,6 +1,9 @@
 # target
 netdisk_server
 
+#cryption key
+*.pem
+
 # Prerequisites
 *.d
 
