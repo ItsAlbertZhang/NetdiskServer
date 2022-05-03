@@ -15,6 +15,6 @@ int getconfig(const char *config_dir, const char *filename, char config[][MAX_CO
 int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir);
 
 // 初始化 MySQL 数据库连接
-int init_mysql(MYSQL *connect, const char *config_dir);
+int init_mysql(MYSQL **mysql_connect, const char *config_dir, RSA *rsa_private, RSA *rsa_public, char config[][MAX_CONFIG_LENGTH]);
 
 #endif /* __PROGRAM_INIT_H__ */

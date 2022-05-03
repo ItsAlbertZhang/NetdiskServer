@@ -1,6 +1,7 @@
 #include "head.h"
 #include "log.h"
 #include "mycrypt.h"
+#include "mylibrary.h"
 #include "program_init.h"
 
 // 生成 rsa 密钥对
@@ -19,20 +20,14 @@ int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir) {
     char public_key_filename[1024] = {0};
     sprintf(public_key_filename, "%s%s", config_dir, "public.pem");
 
-    ret = open(private_key_filename, O_RDWR | O_CREAT | O_EXCL, 0666);
-    if (-1 == ret) {
-        close(ret);
-        ret = open(public_key_filename, O_RDWR | O_CREAT | O_EXCL, 0666);
-        if (-1 == ret) {
-            close(ret);
-            // 两个文件均存在
-            ret = check_rsa_keys(private_key_filename, public_key_filename);
-            if (0 == ret) {
-                log_handle("服务端运行所需密钥验证完毕.");
-                ret = get_rsa_from_file(private_rsa, public_rsa, private_key_filename, public_key_filename);
-                RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
-                return 0;
-            }
+    if (file_exist(NULL, private_key_filename) && file_exist(NULL, public_key_filename)) {
+        // 两个文件均存在
+        ret = check_rsa_keys(private_key_filename, public_key_filename);
+        if (0 == ret) {
+            log_handle("服务端运行所需密钥验证完毕.");
+            ret = get_rsa_from_file(private_rsa, public_rsa, private_key_filename, public_key_filename);
+            RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
+            return 0;
         }
     }
 
@@ -106,9 +101,8 @@ static int check_rsa_keys(const char *private_key_filename, const char *public_k
     unsigned char plaintext[1024] = {0};
     unsigned char ciphertext[256] = {0};
 
-    // 打开公钥文件, 读取 128 个字节
-    int fd = open(public_key_filename, O_RDONLY);
-    ret = read(fd, source, 128);
+    // 从公钥文件中读取 128 个字节
+    ret = read_string_from_file(source, 128, NULL, public_key_filename);
     // 对读取到的内容加密再解密, 进行比对
     ret = rsa_encrypt(source, ciphertext, public_rsa, PUBKEY);
     RET_CHECK_BLACKLIST(-1, ret, "RSAfile_encrypt");

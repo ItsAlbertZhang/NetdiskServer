@@ -3,7 +3,7 @@
 int rsa_encrypt(const unsigned char *plaintext, unsigned char *ciphertext, RSA *rsa, int rsa_type) {
     int ret = 0;
 
-    // 解密
+    // 加密
     int rsa_len = RSA_size(rsa);
     bzero(ciphertext, rsa_len);
     if (rsa_type) {

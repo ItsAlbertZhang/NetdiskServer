@@ -14,7 +14,7 @@ ROOT_DIR = $(shell pwd)
 # 编译选项
 CFLAGS = -I $(ROOT_DIR)/$(SRC_DIR)/include
 # 链接选项
-LFLAGS = -lpthread -lcrypto
+LFLAGS = -lpthread -lmysqlclient -lssl -lcrypto
 
 # 获取目标文件
 OBJS = ${wildcard $(OBJS_DIR)/*.o}

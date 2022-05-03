@@ -11,7 +11,7 @@
 // #include <netinet/in.h>
 // #include <pthread.h>
 // #include <pwd.h>
-// #include <signal.h>
+#include <signal.h>
 #include <stdio.h>
 // #include <stdlib.h>
 #include <string.h>
@@ -30,17 +30,17 @@
 #include <sys/types.h>
 // #include <sys/wait.h>
 // #include <time.h>
-#include <unistd.h>
 #include <mysql/mysql.h>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
+#include <unistd.h>
 
-#define RET_CHECK_BLACKLIST(error_ret, ret, funcname)                            \
-    {                                                                            \
-        if (error_ret == ret) {                                                  \
+#define RET_CHECK_BLACKLIST(error_ret, ret, funcname)                   \
+    {                                                                   \
+        if (error_ret == ret) {                                         \
             printf("%s:%d: %s error.\n", __FILE__, __LINE__, funcname); \
-            return -1;                                                           \
-        }                                                                        \
+            return -1;                                                  \
+        }                                                               \
     }
 
 #endif

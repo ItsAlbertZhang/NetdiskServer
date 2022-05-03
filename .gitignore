@@ -3,6 +3,7 @@ netdisk_server
 
 #cryption key
 *.pem
+*.pwd
 
 # Prerequisites
 *.d
