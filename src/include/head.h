@@ -43,4 +43,12 @@
         }                                                               \
     }
 
+#define THREAD_RET_CHECK(ret, funcname)                                                   \
+    {                                                                                     \
+        if (ret != 0) {                                                                   \
+            printf("%s:%d: %s error: %s\n", __FILE__, __LINE__, funcname, strerror(ret)); \
+            return -1;                                                                    \
+        }                                                                                 \
+    }
+
 #endif

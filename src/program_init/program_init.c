@@ -2,6 +2,7 @@
 #include "head.h"
 #include "log.h"
 #include "mycrypt.h"
+#include "program_stat.h"
 
 int program_init(void) {
     int ret = 0;
@@ -24,6 +25,12 @@ int program_init(void) {
     ret = init_mysql(&mysql_connect_p, config_dir, rsa_private, rsa_public, config);
     RET_CHECK_BLACKLIST(-1, ret, "init_mysql");
     log_handle("成功连接 MySQL 数据库.");
+
+    // 初始化线程池
+    struct thread_stat_t thread_stat;
+    ret = init_pthread_pool(&thread_stat, config_dir, config);
+    RET_CHECK_BLACKLIST(-1, ret, "init_pthread_pool");
+    log_handle("成功初始化线程池.");
 
     return 0;
 }

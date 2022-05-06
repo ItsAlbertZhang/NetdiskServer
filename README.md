@@ -10,6 +10,16 @@ Netdisk server project practice.
 
 ## 环境与依赖
 
-本项目运行在 Linux 环境下, 且依赖 libmysqlclient-dev 软件包与 MySQL 数据库建立连接.
+本项目运行在 Linux 环境下, 测试环境为 Ubuntu 20.04.
 
-测试环境为 Ubuntu 20.04.
+依赖: `-lpthread` , `-lmysqlclient` , `-lssl` , `-lcrypto`.
+
+测试环境下为: apt 获取 mysqlclient 软件包; 编译安装 openssl 1.1.1 软件包.
+
+## 配置文件
+
+详见 config/README.md .
+
+## 开发手册
+
+详见 Manual.md .
