@@ -26,7 +26,6 @@ int init_mysql(MYSQL **mysql_connect, const char *config_dir, RSA *rsa_private, 
             printf("如果你确认密码文件无误, 可退出程序修改配置文件后重试.\n");
             ret = mysql_get_pwd(mysql_connect, config_dir, rsa_public, config);
             RET_CHECK_BLACKLIST(-1, ret, "mysql_get_pwd");
-        } else {
         }
     } else {
         // 密码文件不存在
@@ -77,23 +76,19 @@ static int mysql_get_pwd(MYSQL **mysql_connect, const char *config_dir, RSA *rsa
     printf("是否要保存密码并在下一次自动登录? 密码将会以加密的方式保存在 ./config/mysql.pwd\n请注意: mysql.pwd 与 private.pem 同时泄露会造成极大的安全隐患, 任何获得这两份文件的人均可获得你的密码明文.\n请输入(y/n):");
     fflush(stdout);
     char savepwd_input;
-    int savepwd_input_illegal = 1, savepwd = -1;
-    cnt = 0;
-    while (savepwd_input_illegal) {
-        if (cnt && savepwd_input == '\n') {
+    int savepwd = -1;
+    while (-1 == savepwd) {
+        if (savepwd_input == '\n') {
             printf("你输入的数据不合法! 请输入\"y\"或\"n\":");
             fflush(stdout);
         }
         savepwd_input = getchar();
         if (savepwd_input == 'y') {
             savepwd = 1;
-            savepwd_input_illegal = 0;
         }
         if (savepwd_input == 'n') {
             savepwd = 0;
-            savepwd_input_illegal = 0;
         }
-        cnt = 1;
     }
     RET_CHECK_BLACKLIST(-1, savepwd, "savepwd");
 

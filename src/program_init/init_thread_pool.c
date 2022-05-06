@@ -22,8 +22,6 @@ int init_pthread_pool(struct thread_stat_t *thread_stat, const char *config_dir,
     for (int i = 0; i < atoi(config[0]); i++) {
         ret = pthread_create(&thread_stat->pthid[i], NULL, child_handle, (void *)&thread_stat->thread_resource);
         THREAD_RET_CHECK(ret, "pthread_create");
-        printf("%s:%d: %ld child thread ready.\n", __FILE__, __LINE__, thread_stat->pthid[i]);
-        usleep(1000);
     }
 
     return 0;

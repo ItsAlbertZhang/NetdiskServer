@@ -21,4 +21,7 @@ int init_mysql(MYSQL **mysql_connect, const char *config_dir, RSA *rsa_private, 
 // 初始化线程池
 int init_pthread_pool(struct thread_stat_t *thread_stat, const char *config_dir, char config[][MAX_CONFIG_LENGTH]);
 
+// 初始化 tcp
+int init_tcp(const char *config_dir, char config[][MAX_CONFIG_LENGTH]);
+
 #endif /* __PROGRAM_INIT_H__ */

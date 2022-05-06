@@ -4,7 +4,7 @@
 #include "mylibrary.h"
 #include "program_init.h"
 
-// 生成 rsa 密钥对
+// 生成 rsa 密钥对并保存至密钥文件
 static int generate_rsa_keys(const char *private_key_filename, const char *public_key_filename);
 // 检查 rsa 密钥是否成对
 static int check_rsa_keys(const char *private_key_filename, const char *public_key_filename);

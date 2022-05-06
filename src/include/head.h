@@ -2,13 +2,13 @@
 #define __HEAD_H__
 
 // #define _GNU_SOURCE
-// #include <arpa/inet.h>
+#include <arpa/inet.h>
 // #include <dirent.h>
 // #include <errno.h>
 #include <fcntl.h>
 // #include <grp.h>
 // #include <netdb.h>
-// #include <netinet/in.h>
+#include <netinet/in.h>
 // #include <pthread.h>
 // #include <pwd.h>
 #include <signal.h>
@@ -24,7 +24,7 @@
 // #include <sys/sem.h>
 // #include <sys/sendfile.h>
 // #include <sys/shm.h>
-// #include <sys/socket.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 // #include <sys/time.h>
 #include <sys/types.h>

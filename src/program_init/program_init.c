@@ -32,5 +32,12 @@ int program_init(void) {
     RET_CHECK_BLACKLIST(-1, ret, "init_pthread_pool");
     log_handle("成功初始化线程池.");
 
+    // 初始化 tcp
+    int sockfd = init_tcp(config_dir, config);
+    RET_CHECK_BLACKLIST(-1, ret, "init_tcp");
+    log_handle("成功初始化 tcp.");
+
+    sleep(1000);
+
     return 0;
 }
