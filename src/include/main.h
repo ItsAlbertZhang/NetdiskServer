@@ -5,6 +5,6 @@
 
 int program_init(struct program_stat_t *program_stat);
 
-int main_thread_handle(void);
+int thread_main_handle(struct program_stat_t *program_stat);
 
 #endif /* __MAIN_H__ */

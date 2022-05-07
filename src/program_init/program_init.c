@@ -2,6 +2,7 @@
 #include "head.h"
 #include "log.h"
 #include "mycrypt.h"
+#include "mylibrary.h"
 #include "program_stat.h"
 
 int program_init(struct program_stat_t *program_stat) {
@@ -30,8 +31,8 @@ int program_init(struct program_stat_t *program_stat) {
     log_print("成功初始化线程池.");
 
     // 初始化 tcp
-    int sockfd = init_tcp(program_stat->local_ip, config_dir, config);
-    RET_CHECK_BLACKLIST(-1, ret, "init_tcp");
+    program_stat->socket_fd = init_tcp(program_stat->local_ip, program_stat->thread_stat.thread_resource.queue->len, config_dir, config);
+    RET_CHECK_BLACKLIST(-1, program_stat->socket_fd, "init_tcp");
     log_print("成功初始化 tcp.");
 
     return 0;

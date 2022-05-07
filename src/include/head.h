@@ -9,14 +9,14 @@
 // #include <grp.h>
 // #include <netdb.h>
 #include <netinet/in.h>
-// #include <pthread.h>
+#include <pthread.h>
 // #include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
 // #include <stdlib.h>
 #include <string.h>
-// #include <strings.h>
-// #include <sys/epoll.h>
+#include <strings.h>
+#include <sys/epoll.h>
 // #include <sys/ipc.h>
 // #include <sys/mman.h>
 // #include <sys/msg.h>

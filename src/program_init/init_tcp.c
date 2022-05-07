@@ -1,7 +1,7 @@
 #include "head.h"
 #include "program_init.h"
 
-int init_tcp(char *local_ip, const char *config_dir, char config[][MAX_CONFIG_LENGTH]) {
+int init_tcp(char *local_ip, int max_listen_num, const char *config_dir, char config[][MAX_CONFIG_LENGTH]) {
     int ret = 0;
 
     // 获取 tcp 配置
@@ -27,7 +27,7 @@ int init_tcp(char *local_ip, const char *config_dir, char config[][MAX_CONFIG_LE
     ret = bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     RET_CHECK_BLACKLIST(-1, sockfd, "bind");
 
-    ret = listen(sockfd, 10); // 执行 listen
+    ret = listen(sockfd, max_listen_num); // 执行 listen
     RET_CHECK_BLACKLIST(-1, sockfd, "listen");
 
     return sockfd;
