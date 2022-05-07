@@ -1,12 +1,13 @@
 #include "head.h"
 #include "program_init.h"
 
-int init_tcp(const char *config_dir, char config[][MAX_CONFIG_LENGTH]) {
+int init_tcp(char *local_ip, const char *config_dir, char config[][MAX_CONFIG_LENGTH]) {
     int ret = 0;
 
     // 获取 tcp 配置
     ret = getconfig(config_dir, "tcp.config", config);
     RET_CHECK_BLACKLIST(-1, ret, "getconfig");
+    strcpy(local_ip, config[2]);
 
     // socket
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);

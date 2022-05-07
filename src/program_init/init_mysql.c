@@ -22,7 +22,7 @@ int init_mysql(MYSQL **mysql_connect, const char *config_dir, RSA *rsa_private, 
         ret = mysql_try_connect_by_pwdfile(mysql_connect, config_dir, rsa_private, config);
         if (-1 == ret) {
             // 使用配置文件登录失败
-            log_handle("密码文件或配置文件错误, 将重设密码.");
+            log_print("密码文件或配置文件错误, 将重设密码.");
             printf("如果你确认密码文件无误, 可退出程序修改配置文件后重试.\n");
             ret = mysql_get_pwd(mysql_connect, config_dir, rsa_public, config);
             RET_CHECK_BLACKLIST(-1, ret, "mysql_get_pwd");
@@ -65,7 +65,7 @@ static int mysql_get_pwd(MYSQL **mysql_connect, const char *config_dir, RSA *rsa
             printf("密码或配置文件错误! 请重新输入密码. 如果你确认密码无误, 可输入 exit 以退出并修改配置文件后重试.\n");
             printf("%s\n", mysql_error(*mysql_connect));
         }
-        mysql_pwd_plaintext = getpass("请输入密码(无回显):\n");
+        mysql_pwd_plaintext = getpass("请输入 MySQL 密码(无回显):\n");
         if (!strcmp(mysql_pwd_plaintext, "exit")) {
             kill(0, SIGINT); // 向自己发送 SIGINT 信号
         }
@@ -95,7 +95,7 @@ static int mysql_get_pwd(MYSQL **mysql_connect, const char *config_dir, RSA *rsa
     if (savepwd) {
         ret = mysql_save_pwd(mysql_pwd_plaintext, config_dir, rsa_public);
         RET_CHECK_BLACKLIST(-1, ret, "mysql_save_pwd");
-        log_handle("成功保存密码.");
+        log_print("成功保存密码.");
     }
 
     mysql_pwd_plaintext = NULL; // 清空密码明文, 确保安全

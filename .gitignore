@@ -5,6 +5,9 @@ netdisk_server
 *.pem
 *.pwd
 
+# .vscode
+.vscode/
+
 # Prerequisites
 *.d
 

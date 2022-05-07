@@ -1,7 +1,9 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-int program_init(void);
+#include "program_stat.h"
+
+int program_init(struct program_stat_t *program_stat);
 
 int main_thread_handle(void);
 
