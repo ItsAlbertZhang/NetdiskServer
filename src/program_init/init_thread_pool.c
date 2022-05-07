@@ -20,7 +20,7 @@ int init_pthread_pool(struct thread_stat_t *thread_stat, const char *config_dir,
 
     // 拉起子线程
     for (int i = 0; i < atoi(config[0]); i++) {
-        ret = pthread_create(&thread_stat->pthid[i], NULL, child_handle, (void *)&thread_stat->thread_resource);
+        ret = pthread_create(&thread_stat->pthid[i], NULL, thread_child_handle, (void *)&thread_stat->thread_resource);
         THREAD_RET_CHECK(ret, "pthread_create");
     }
 
