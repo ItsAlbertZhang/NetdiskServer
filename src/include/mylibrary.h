@@ -35,4 +35,12 @@ int queue_in(struct queue_t *Q, int elem);
 // 出队
 int queue_out(struct queue_t *Q, int *elem);
 
+// rsa
+
+#define PRIKEY 0
+#define PUBKEY 1
+
+int rsa_encrypt(const unsigned char *plaintext, unsigned char *ciphertext, RSA *rsa, int rsa_type);
+int rsa_decrypt(unsigned char *plaintext, const unsigned char *ciphertext, RSA *rsa, int rsa_type);
+
 #endif /* __MYLIBRARY_H__ */

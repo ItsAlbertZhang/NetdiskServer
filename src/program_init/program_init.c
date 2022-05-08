@@ -1,7 +1,6 @@
 #include "program_init.h"
 #include "head.h"
 #include "log.h"
-#include "mycrypt.h"
 #include "mylibrary.h"
 #include "program_stat.h"
 
