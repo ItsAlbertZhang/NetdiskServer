@@ -3,9 +3,6 @@
 #include "main.h"
 #include "mylibrary.h"
 
-// 添加 epoll 监听
-static int epoll_add(int epfd, int fd);
-
 int thread_main_handle(struct program_stat_t *program_stat) {
     int ret = 0;
 
@@ -36,28 +33,14 @@ int thread_main_handle(struct program_stat_t *program_stat) {
         RET_CHECK_BLACKLIST(-1, ep_ready, "epoll_wait");
         for (int i = 0; i < ep_ready; i++) {
             if (events[i].data.fd == program_stat->socket_fd) { // 有来自 socket_fd 的消息 (新连接)
-                ret = connect_init_handle(program_stat->socket_fd, connect_stat_arr, max_connect_num, connect_timer_arr);
+                ret = connect_init_handle(program_stat->socket_fd, connect_stat_arr, max_connect_num, connect_timer_arr, epfd);
                 RET_CHECK_BLACKLIST(-1, ret, "connect_init_handle");
             } else { //  有来自已有连接的消息
                 // ret = connect_msg_handle();
             }
         }
         // 处理下一秒对应的时间轮片上的连接
-        ret = connect_timer_handle(connect_timer_arr);
+        ret = connect_timer_handle(connect_timer_arr, epfd);
         RET_CHECK_BLACKLIST(-1, ret, "connect_timer_handle");
     }
-}
-
-static int epoll_add(int epfd, int fd) {
-    static int ret = 0;
-    static struct epoll_event event;
-
-    bzero(&event, sizeof(event));
-    event.events = EPOLLIN;
-    event.data.fd = fd;
-
-    ret = epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &event);
-    RET_CHECK_BLACKLIST(-1, ret, "epoll_ctl");
-
-    return 0;
 }

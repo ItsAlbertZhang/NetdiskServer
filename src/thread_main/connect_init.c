@@ -3,7 +3,7 @@
 #include "mylibrary.h"
 #include "thread_main.h"
 
-int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr) {
+int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr, int epfd) {
     int ret = 0;
 
     // accept 连接
@@ -28,6 +28,10 @@ int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, 
     ret = connect_timer_in(&connect_stat_arr[i], connect_timer_arr);
     RET_CHECK_BLACKLIST(-1, ret, "connect_timer_in");
     printf("new connect fd = %d\n", connect_stat_arr[i].fd);
+
+    // 将新连接添加至 epoll 监听
+    ret = epoll_add(epfd, connect_stat_arr[i].fd);
+    RET_CHECK_BLACKLIST(-1, ret, "epoll_add");
 
     return 0;
 }
