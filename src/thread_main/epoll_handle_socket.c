@@ -1,7 +1,7 @@
 #include "head.h"
 #include "program_stat.h"
 #include "thread_main.h"
-#include "log.h"
+#include "mylibrary.h"
 
 static int connect_init(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr);
 

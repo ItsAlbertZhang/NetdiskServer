@@ -1,7 +1,7 @@
 #ifndef __MYLIBRARY_H__
 #define __MYLIBRARY_H__
 
-// file
+// file.c
 
 // 检查文件是否存在, 存在返回 1, 不存在返回 0. dir 可以为 NULL.
 int file_exist(const char *dir, const char *filename);
@@ -12,7 +12,7 @@ int read_string_from_file(char *str, int maxlen, const char *dir, const char *fi
 // 将字符串写入文件, 长度为 len, 返回值为实际写入长度. dir 可以为 NULL.
 int write_file_from_string(const char *str, int len, const char *dir, const char *filename);
 
-// queue
+// queue.c
 
 // 队列结构体
 struct queue_t {
@@ -35,12 +35,20 @@ int queue_in(struct queue_t *Q, int elem);
 // 出队
 int queue_out(struct queue_t *Q, int *elem);
 
-// rsa
+// rsa.c
 
 #define PRIKEY 0
 #define PUBKEY 1
 
 int rsa_encrypt(const unsigned char *plaintext, unsigned char *ciphertext, RSA *rsa, int rsa_type);
 int rsa_decrypt(unsigned char *plaintext, const unsigned char *ciphertext, RSA *rsa, int rsa_type);
+
+// log.c
+
+// 打印日志
+int log_print(const char *string);
+
+// 打印日志并保存至数据库
+int log_mysql(MYSQL *mysql_connect, const char *local_ip, int type, const char *str);
 
 #endif /* __MYLIBRARY_H__ */
