@@ -13,7 +13,7 @@ int thread_main_handle(struct program_stat_t *program_stat) {
     struct connect_stat_t *connect_stat_arr = (struct connect_stat_t *)malloc(sizeof(struct connect_stat_t) * max_connect_num);
     bzero(connect_stat_arr, sizeof(struct connect_stat_t) * max_connect_num); // 清空连接状态
 
-    // malloc 结构体数组: 时间轮定时器  struct connect_timer_hashnode; 每个数组成员均为一个时间轮片, 数组成员个数即为时间轮一轮循环的秒数.
+    // malloc 结构体数组: 时间轮定时器 struct connect_timer_hashnode; 每个数组成员均为一个时间轮片, 数组成员个数即为时间轮一轮循环的秒数.
     // 数组成员下标是时间的除留余法散列函数, 整个时间轮定时器采用拉链法哈希构建.每个数组成员实际上为哈希表拉链的头结点.
     struct connect_timer_hashnode *connect_timer_arr = (struct connect_timer_hashnode *)malloc(sizeof(struct connect_timer_hashnode) * AUTO_DISCONNECT_SECOND);
     bzero(connect_timer_arr, sizeof(struct connect_timer_hashnode) * AUTO_DISCONNECT_SECOND);
@@ -22,7 +22,7 @@ int thread_main_handle(struct program_stat_t *program_stat) {
     int epfd = epoll_create(1);                     // 创建 epoll 句柄
     ret = epoll_add(epfd, program_stat->socket_fd); // 将 socket_fd 添加至 epoll 监听
     RET_CHECK_BLACKLIST(-1, ret, "epoll_add");
-    // malloc 结构体数组: 返回的监听结果struct epoll_event; 数组的成员个数为最大连接数 +1 (除了要监听连接之外, 还要监听 socket)
+    // malloc 结构体数组: 返回的监听结果 struct epoll_event; 数组的成员个数为最大连接数 + 1 (除了要监听连接之外, 还要监听 socket)
     struct epoll_event *events = (struct epoll_event *)malloc(sizeof(struct epoll_event) * (max_connect_num + 1));
     bzero(events, sizeof(struct epoll_event) * (max_connect_num + 1));
     int ep_ready = 0; // 有消息来流的监听个数
