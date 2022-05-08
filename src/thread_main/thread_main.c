@@ -1,7 +1,7 @@
 #include "thread_main.h"
 #include "head.h"
+#include "main.h"
 #include "mylibrary.h"
-#include "program_stat.h"
 
 // 添加 epoll 监听
 static int epoll_add(int epfd, int fd);

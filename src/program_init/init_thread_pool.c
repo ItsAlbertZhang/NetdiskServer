@@ -1,7 +1,7 @@
 #include "head.h"
+#include "main.h"
 #include "mylibrary.h"
 #include "program_init.h"
-#include "program_stat.h"
 #include "thread_child.h"
 
 int init_pthread_pool(struct thread_stat_t *thread_stat, const char *config_dir, char config[][MAX_CONFIG_LENGTH]) {

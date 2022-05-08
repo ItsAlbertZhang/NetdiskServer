@@ -1,7 +1,7 @@
 #include "program_init.h"
 #include "head.h"
+#include "main.h"
 #include "mylibrary.h"
-#include "program_stat.h"
 
 int program_init(struct program_stat_t *program_stat) {
     int ret = 0;

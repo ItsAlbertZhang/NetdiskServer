@@ -1,7 +1,6 @@
 #include "main.h"
 #include "head.h"
 #include "mylibrary.h"
-#include "program_stat.h"
 
 int main(int argc, const char *argv[]) {
     int ret = 0;

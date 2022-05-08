@@ -5,7 +5,7 @@
 #define MAX_CONFIG_LENGTH 256
 
 #include "head.h"
-#include "program_stat.h"
+#include "main.h"
 
 // 读取配置文件前, 获取配置文件目录
 int getconfig_init(char *dir, int dirlen);
