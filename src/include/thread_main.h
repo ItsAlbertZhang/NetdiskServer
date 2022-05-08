@@ -26,10 +26,10 @@ struct connect_timer_hashnode {
 };
 
 // 未实现
-int epoll_handle_established(void);
+int connect_msg_handle(void);
 
 // 消息来源为 socket_fd, 有新连接
-int epoll_handle_socket(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr);
+int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr);
 
 // 将新连接放入时间轮定时器
 int connect_timer_in(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr);
@@ -41,6 +41,6 @@ int connect_timer_out(struct connect_stat_t *connect_stat, struct connect_timer_
 int connect_timer_move(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr);
 
 // 处理下一秒对应的时间轮片上的连接
-int connect_timer_handle_next_second(struct connect_timer_hashnode *connect_timer_arr);
+int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr);
 
 #endif

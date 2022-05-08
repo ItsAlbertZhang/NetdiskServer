@@ -62,7 +62,7 @@ int connect_timer_move(struct connect_stat_t *connect_stat, struct connect_timer
     return 0;
 }
 
-int connect_timer_handle_next_second(struct connect_timer_hashnode *connect_timer_arr) {
+int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr) {
     int ret = 0;
     time_t now = time(NULL) + 1;
     int i = now % AUTO_DISCONNECT_SECOND; // 获取下一秒对应的时间轮片
