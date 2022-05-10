@@ -2,7 +2,7 @@
 
 int file_exist(const char *dir, const char *filename) {
     int ret = 0;
-    static char fullname[1024];
+    char fullname[1024];
     // 拼接完整路径
     if (NULL == dir) {
         strcpy(fullname, filename);
@@ -24,7 +24,7 @@ int file_exist(const char *dir, const char *filename) {
 
 int read_string_from_file(char *str, int maxlen, const char *dir, const char *filename) {
     int ret = 0;
-    static char fullname[1024];
+    char fullname[1024];
     // 拼接完整路径
     if (NULL == dir) {
         strcpy(fullname, filename);
@@ -44,7 +44,7 @@ int read_string_from_file(char *str, int maxlen, const char *dir, const char *fi
 
 int write_file_from_string(const char *str, int len, const char *dir, const char *filename) {
     int ret = 0;
-    static char fullname[1024];
+    char fullname[1024];
     // 拼接完整路径
     if (NULL == dir) {
         strcpy(fullname, filename);

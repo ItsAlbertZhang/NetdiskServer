@@ -1,8 +1,8 @@
 #include "head.h"
 
 int epoll_add(int epfd, int fd) {
-    static int ret = 0;
-    static struct epoll_event event;
+    int ret = 0;
+    struct epoll_event event;
 
     bzero(&event, sizeof(event));
     event.events = EPOLLIN;
@@ -15,7 +15,7 @@ int epoll_add(int epfd, int fd) {
 }
 
 int epoll_del(int epfd, int fd) {
-    static int ret = 0;
+    int ret = 0;
 
     ret = epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
     RET_CHECK_BLACKLIST(-1, ret, "epoll_ctl");

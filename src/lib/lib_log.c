@@ -5,11 +5,10 @@ int log_print(const char *str) {
 }
 
 int log_mysql(MYSQL *mysql_connect, const char *local_ip, int type, const char *str) {
-    static time_t now;
-    static struct tm now_tm;
-    time(&now);
+    time_t now = time(&now);
+    struct tm now_tm;
     gmtime_r(&now, &now_tm);
-    static char type_str[10];
+    char type_str[10];
     switch (type) {
     case 0:
         strcpy(type_str, "DEBUG");
@@ -31,7 +30,7 @@ int log_mysql(MYSQL *mysql_connect, const char *local_ip, int type, const char *
     }
     printf("[%d:%d:%d][%s] %s\n", now_tm.tm_hour + 8, now_tm.tm_min, now_tm.tm_sec, type_str, str);
 
-    static char query[1024];
+    char query[1024] = {0};
     sprintf(query, "INSERT INTO log_main(server_ip, type, log) VALUES('%s', %d, '%s');", local_ip, type, str);
     return mysql_query(mysql_connect, query);
 }

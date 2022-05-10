@@ -26,7 +26,7 @@ struct connect_timer_hashnode {
 };
 
 // 未实现
-int connect_msg_handle(void);
+// int connect_msg_handle(void);
 
 // 消息来源为 socket_fd, 有新连接
 int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr, int epfd);
