@@ -109,4 +109,13 @@
 
 ### 流程设计
 
+详见 Manual.png / Manual.pdf / Manual.xmind (暂未上传).
+
+.png - 便于在线查看的图片版本.
+
+.pdf - 便于对文字进行复制的文档版本.
+
+.xmind - XMind 软件的源文件版本.
+
 ### 协议设计
+
