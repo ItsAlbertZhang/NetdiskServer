@@ -82,7 +82,7 @@ int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr) {
             ret = connect_destory(thisstat, connect_timer_arr);
             RET_CHECK_BLACKLIST(-1, ret, "connect_destory");
         } else {
-            // 该连接在上一个时间轮循环中无活动
+            // 该连接在上一个时间轮循环中有活动
             ret = connect_timer_move(thisstat, connect_timer_arr); // 移动时间轮定时器中的连接至其应在位置
             RET_CHECK_BLACKLIST(-1, ret, "connect_timer_move");
         }
