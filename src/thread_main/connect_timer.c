@@ -60,10 +60,13 @@ int connect_timer_move(struct connect_stat_t *connect_stat, struct connect_timer
     connect_stat->connect_timer_index = connect_stat->connect_timer_real;
     connect_stat->connect_timer_real = -1;
 
+    sprintf(logbuf, "已检查 %d 号连接, 并成功将其移动至其应在结点.", connect_stat->fd);
+    logging(LOG_DEBUG, logbuf);
+
     return 0;
 }
 
-int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr, int epfd) {
+int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr) {
     int ret = 0;
     time_t now = time(NULL) + 1;
     int i = now % AUTO_DISCONNECT_SECOND; // 获取下一秒对应的时间轮片
@@ -76,17 +79,20 @@ int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr, int e
         thisstat = thisnode->data.conn;
         if (-1 == thisnode->data.conn->connect_timer_real) {
             // 该连接在上一个时间轮循环中无活动
-            ret = connect_timer_out(thisstat, connect_timer_arr); // 将连接从时间轮定时器中取出
-            RET_CHECK_BLACKLIST(-1, ret, "connect_timer_out");
-            ret = epoll_del(epfd, thisstat->fd); // 取消 epoll 监听
-            RET_CHECK_BLACKLIST(-1, ret, "epoll_del");
-            close(thisstat->fd); // 关闭连接
-            RET_CHECK_BLACKLIST(-1, ret, "close");
-            bzero(thisstat, sizeof(struct connect_stat_t)); // 清空状态
+            ret = connect_destory(thisstat, connect_timer_arr);
+            RET_CHECK_BLACKLIST(-1, ret, "connect_destory");
         } else {
             // 该连接在上一个时间轮循环中无活动
             ret = connect_timer_move(thisstat, connect_timer_arr); // 移动时间轮定时器中的连接至其应在位置
             RET_CHECK_BLACKLIST(-1, ret, "connect_timer_move");
         }
     }
+}
+
+int connect_timer_update(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr) {
+    time_t now = time(NULL);
+    if (connect_stat->fd) {
+        connect_stat->connect_timer_real = now % AUTO_DISCONNECT_SECOND; // 放入的时间轮片
+    }
+    return 0;
 }

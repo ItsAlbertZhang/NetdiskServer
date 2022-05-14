@@ -1,6 +1,7 @@
 #include "head.h"
+#include "thread_main.h"
 
-int epoll_add(int epfd, int fd) {
+int epoll_add(int fd) {
     int ret = 0;
     struct epoll_event event;
 
@@ -14,7 +15,7 @@ int epoll_add(int epfd, int fd) {
     return 0;
 }
 
-int epoll_del(int epfd, int fd) {
+int epoll_del(int fd) {
     int ret = 0;
 
     ret = epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);

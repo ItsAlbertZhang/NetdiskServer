@@ -12,7 +12,7 @@ BIN = netdisk_server
 # 获取工程根目录
 ROOT_DIR = $(shell pwd)
 # 编译选项
-CFLAGS = -I $(ROOT_DIR)/$(SRC_DIR)/include
+CFLAGS = -I $(ROOT_DIR)/$(SRC_DIR)/include -DDEBUG
 # 链接选项
 LFLAGS = -lpthread -lmysqlclient -lssl -lcrypto
 

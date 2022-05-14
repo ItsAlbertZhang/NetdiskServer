@@ -1,13 +1,46 @@
+#include "connect_msg.h"
 #include "head.h"
 #include "main.h"
 #include "mylibrary.h"
 #include "thread_main.h"
 
-int connect_msg_handle(struct connect_stat_t *connect_stat) {
+int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr) {
     int ret = 0;
     char buf[1024] = {0};
 
-    
+    // 判断请求类型
+    ret = connect_msg_fetchtype(connect_stat->fd, buf);
+    RET_CHECK_BLACKLIST(-1, ret, "connect_msg_fetchtype");
+    if (0 == ret) {
+        // 对方已断开连接
+        ret = connect_destory(connect_stat, connect_timer_arr);
+        RET_CHECK_BLACKLIST(-1, ret, "connect_destory");
+    }
+
+    switch (buf[0]) {
+    case MT_LOGIN:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_LOGIN 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        break;
+    case MT_REGIST:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_REGIST 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        break;
+    case MT_RECONN:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_RECONN 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        break;
+    case MT_COMM_S:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_COMM_S 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        break;
+    case MT_COMM_L:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_COMM_L 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        break;
+    default:
+        break;
+    }
 
     return 0;
 }
@@ -26,4 +59,11 @@ size_t recv_n(int connect_fd, void *buf, size_t len, int flags) {
         recved_len += ret;
     }
     return recved_len; // 正常情况下, 返回接收到的字节数.
+}
+
+// 判断请求类型
+int connect_msg_fetchtype(int connect_fd, void *buf) {
+    int ret = 0;
+    ret = recv_n(connect_fd, buf, 1, 0);
+    return ret;
 }

@@ -16,7 +16,7 @@ Netdisk server project practice.
 
 测试环境下为: apt 获取 mysqlclient 软件包; 编译安装 openssl 1.1.1 软件包.
 
-## 配置文件
+## 配置 .config 文件
 
 详见 config/README.md .
 

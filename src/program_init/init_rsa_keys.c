@@ -22,7 +22,7 @@ int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir) {
         // 两个文件均存在
         ret = check_rsa_keys(private_key_filename, public_key_filename);
         if (0 == ret) {
-            log_print("服务端运行所需密钥验证完毕.");
+            printf("服务端运行所需密钥验证完毕.\n");
             ret = get_rsa_from_file(private_rsa, public_rsa, private_key_filename, public_key_filename);
             RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
             return 0;
@@ -34,7 +34,7 @@ int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir) {
     unlink(public_key_filename);
     ret = generate_rsa_keys(private_key_filename, public_key_filename);
     RET_CHECK_BLACKLIST(-1, ret, "generate_rsa_keys");
-    log_print("服务端运行所需密钥不存在或不成对, 已重新生成密钥.");
+    printf("服务端运行所需密钥不存在或不成对, 已重新生成密钥.\n");
 
     ret = get_rsa_from_file(private_rsa, public_rsa, private_key_filename, public_key_filename);
     RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");

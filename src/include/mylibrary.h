@@ -45,18 +45,20 @@ int rsa_decrypt(unsigned char *plaintext, const unsigned char *ciphertext, RSA *
 
 // log.c
 
-// 打印日志
-int log_print(const char *string);
+extern char logbuf[4096];
 
-// 打印日志并保存至数据库
-int log_mysql(MYSQL *mysql_connect, const char *local_ip, int type, const char *str);
+// 初始化日志功能
+int log_init(MYSQL *arg_mysql_connect, char *arg_local_ip);
+
+// 记录日志
+int logging(int type, const char *str);
 
 // epoll.c
 
 // 添加 epoll 监听
-int epoll_add(int epfd, int fd);
+int epoll_add(int fd);
 
 // 移除 epoll 监听
-int epoll_del(int epfd, int fd);
+int epoll_del(int fd);
 
 #endif /* __MYLIBRARY_H__ */

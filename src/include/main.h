@@ -24,7 +24,15 @@ struct program_stat_t {
     MYSQL *mysql_connect;
     struct thread_stat_t thread_stat;
     int socket_fd;
-    char local_ip[16];
+    char local_sign[64];
+};
+
+enum log_type {
+    LOG_DEBUG,
+    LOG_INFO,
+    LOG_WARN,
+    LOG_ERROR,
+    LOG_FATAL,
 };
 
 int program_init(struct program_stat_t *program_stat);
