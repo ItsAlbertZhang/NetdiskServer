@@ -15,7 +15,7 @@ enum msg_type {
 // 循环接收, 避免因网络数据分包导致的错误
 size_t recv_n(int connect_fd, void *buf, size_t len, int flags);
 
-// 判断请求类型
+// 接收来自客户端的请求类型标志
 int connect_msg_fetchtype(int connect_fd, void *buf);
 
 #endif /* __CONNECT_MSG_H__ */

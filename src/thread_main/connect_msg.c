@@ -8,7 +8,7 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
     int ret = 0;
     char buf[1024] = {0};
 
-    // 判断请求类型
+    // 接收来自客户端的请求类型标志
     ret = connect_msg_fetchtype(connect_stat->fd, buf);
     RET_CHECK_BLACKLIST(-1, ret, "connect_msg_fetchtype");
     if (0 == ret) {
@@ -61,7 +61,7 @@ size_t recv_n(int connect_fd, void *buf, size_t len, int flags) {
     return recved_len; // 正常情况下, 返回接收到的字节数.
 }
 
-// 判断请求类型
+// 接收来自客户端的请求类型标志
 int connect_msg_fetchtype(int connect_fd, void *buf) {
     int ret = 0;
     ret = recv_n(connect_fd, buf, 1, 0);
