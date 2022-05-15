@@ -47,8 +47,8 @@ int rsa_decrypt(unsigned char *plaintext, const unsigned char *ciphertext, RSA *
 
 extern char logbuf[4096];
 
-// 初始化日志功能
-int log_init(MYSQL *arg_mysql_connect, char *arg_local_sign);
+// 初始化日志数据库存储功能
+int log_mysql_init(MYSQL *arg_mysql_connect, char *arg_local_sign);
 
 // 记录日志
 int logging(int type, const char *str);
