@@ -61,4 +61,9 @@ int epoll_add(int fd);
 // 移除 epoll 监听
 int epoll_del(int fd);
 
+// random.c
+
+// 生成随机字符串
+int random_gen_str(char *str, int len, int seed);
+
 #endif /* __MYLIBRARY_H__ */
