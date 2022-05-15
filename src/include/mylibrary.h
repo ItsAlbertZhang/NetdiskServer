@@ -42,6 +42,8 @@ int queue_out(struct queue_t *Q, int *elem);
 
 int rsa_encrypt(const unsigned char *plaintext, unsigned char *ciphertext, RSA *rsa, int rsa_type);
 int rsa_decrypt(unsigned char *plaintext, const unsigned char *ciphertext, RSA *rsa, int rsa_type);
+int rsa_rsa2str(char *str, RSA *rsa, int rsa_type);
+int rsa_str2rsa(const char *str, RSA **rsa, int rsa_type);
 
 // log.c
 

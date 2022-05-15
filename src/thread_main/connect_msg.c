@@ -4,7 +4,7 @@
 #include "mylibrary.h"
 #include "thread_main.h"
 
-int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr) {
+int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct program_stat_t *program_stat) {
     int ret = 0;
     char buf[1024] = {0};
 
@@ -47,6 +47,10 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
     }
 
     random_gen_str(buf, 30, connect_stat->fd);
+    printf("%s\n", buf);
+
+    bzero(buf, sizeof(buf));
+    rsa_rsa2str(buf, program_stat->public_rsa, PUBKEY);
     printf("%s\n", buf);
 
     return 0;

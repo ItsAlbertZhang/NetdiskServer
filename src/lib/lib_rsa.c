@@ -32,3 +32,46 @@ int rsa_decrypt(unsigned char *plaintext, const unsigned char *ciphertext, RSA *
 
     return ret; // 返回读取到的明文长度
 }
+
+int rsa_rsa2str(char *str, RSA *rsa, int rsa_type) {
+    int ret = 0;
+
+    BIO *bio = BIO_new(BIO_s_mem());
+    if (rsa_type) {
+        ret = PEM_write_bio_RSAPublicKey(bio, rsa);
+        RET_CHECK_BLACKLIST(0, ret, "PEM_write_bio_RSAPublicKey")
+    } else {
+        ret = PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
+        RET_CHECK_BLACKLIST(0, ret, "PEM_write_bio_RSAPrivateKey")
+    }
+    int keylen = BIO_pending(bio);
+    bzero(str, keylen + 1);
+    ret = BIO_read(bio, str, keylen);
+    if (ret < 0 || ret == 0) {
+        return -1;
+    }
+
+    BIO_free_all(bio);
+    return keylen + 1;
+}
+
+int rsa_str2rsa(const char *str, RSA **rsa, int rsa_type) {
+    int ret = 0;
+    RSA *rsa_ret = NULL;
+
+    BIO *bio = BIO_new(BIO_s_mem());
+    ret = BIO_write(bio, str, strlen(str));
+    if (ret < 0 || ret == 0) {
+        return -1;
+    }
+    if (rsa_type) {
+        rsa_ret = PEM_read_bio_RSAPublicKey(bio, rsa, NULL, NULL);
+        RET_CHECK_BLACKLIST(NULL, rsa_ret, "PEM_read_bio_RSAPublicKey");
+    } else {
+        rsa_ret = PEM_read_bio_RSAPrivateKey(bio, rsa, NULL, NULL);
+        RET_CHECK_BLACKLIST(NULL, rsa_ret, "PEM_read_bio_RSAPrivateKey");
+    }
+
+    BIO_free_all(bio);
+    return 0;
+}

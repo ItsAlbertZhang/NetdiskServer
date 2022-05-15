@@ -112,20 +112,27 @@ static int check_rsa_keys(const char *private_key_filename, const char *public_k
 }
 
 static int get_rsa_from_file(RSA **private_rsa, RSA **public_rsa, const char *private_key_filename, const char *public_key_filename) {
+    int ret = 0;
+    
     // 打开 RSA 密钥文件
-    FILE *private_fp = fopen(private_key_filename, "rb");
-    RET_CHECK_BLACKLIST(NULL, private_fp, "fopen");
-    FILE *public_fp = fopen(public_key_filename, "rb");
-    RET_CHECK_BLACKLIST(NULL, public_fp, "fopen");
+    int private_fd = open(private_key_filename, O_RDWR);
+    RET_CHECK_BLACKLIST(-1, private_fd, "open");
+    int public_fd = open(public_key_filename, O_RDWR);
+    RET_CHECK_BLACKLIST(-1, public_fd, "open");
 
     // 从文件中获取 RSA 信息
-    *private_rsa = PEM_read_RSAPrivateKey(private_fp, NULL, NULL, NULL);
-    RET_CHECK_BLACKLIST(NULL, private_rsa, "PEM_read_RSAPrivateKey");
-    *public_rsa = PEM_read_RSAPublicKey(public_fp, NULL, NULL, NULL);
-    RET_CHECK_BLACKLIST(NULL, public_rsa, "PEM_read_RSAPrivateKey");
+    char buf[4096];
+    bzero(buf, sizeof(buf));
+    ret = read(private_fd, buf, sizeof(buf));
+    RET_CHECK_BLACKLIST(-1, ret, "read");
+    rsa_str2rsa(buf, private_rsa, PRIKEY);
+    bzero(buf, sizeof(buf));
+    ret = read(public_fd, buf, sizeof(buf));
+    RET_CHECK_BLACKLIST(-1, ret, "read");
+    rsa_str2rsa(buf, public_rsa, PUBKEY);
 
-    fclose(private_fp);
-    fclose(public_fp);
+    close(private_fd);
+    close(public_fd);
 
     return 0;
 }

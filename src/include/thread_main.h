@@ -2,6 +2,7 @@
 #define __THREAD_MAIN_H__
 
 #include "head.h"
+#include "main.h"
 
 #define AUTO_DISCONNECT_SECOND 16 // 16 秒未操作自动断开
 
@@ -28,7 +29,7 @@ struct connect_timer_hashnode {
 extern int epfd;
 
 // 消息来源为已有连接
-int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr);
+int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct program_stat_t *program_stat);
 
 // 消息来源为 socket_fd, 有新连接
 int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr);

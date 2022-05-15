@@ -39,7 +39,7 @@ int thread_main_handle(struct program_stat_t *program_stat) {
                 RET_CHECK_BLACKLIST(-1, ret, "connect_init_handle");
             } else { //  有来自已有连接的消息
                 // 处理消息
-                ret = connect_msg_handle(&connect_stat_arr[events[i].data.fd % max_connect_num], connect_timer_arr);
+                ret = connect_msg_handle(&connect_stat_arr[events[i].data.fd % max_connect_num], connect_timer_arr, program_stat);
                 RET_CHECK_BLACKLIST(-1, ret, "connect_msg_handle");
                 // 处理时间轮定时器
                 ret = connect_timer_update(&connect_stat_arr[events[i].data.fd % max_connect_num], connect_timer_arr);
