@@ -2,6 +2,8 @@
 #define __CONNECT_MSG_H__
 
 #include "head.h"
+#include "main.h"
+#include "thread_main.h"
 
 // 消息类型标志
 enum msg_type {
@@ -19,5 +21,8 @@ size_t recv_n(int connect_fd, void *buf, size_t len, int flags);
 
 // 接收来自客户端的消息类型标志
 int connect_msg_fetchtype(int connect_fd, void *buf);
+
+// 下发验证请求
+int msg_reqconf(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
 
 #endif /* __CONNECT_MSG_H__ */

@@ -6,7 +6,7 @@
 
 ### mysql.config
 
-第一行: 服务器 ip.
+第一行: 服务端 ip.
 
 第二行: MySQL 用户名.
 

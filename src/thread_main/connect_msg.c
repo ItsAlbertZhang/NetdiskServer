@@ -21,6 +21,8 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
     case MT_REQCONF:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_REQCONF 消息.", connect_stat->fd);
         logging(LOG_DEBUG, logbuf);
+        ret = msg_reqconf(connect_stat, program_stat);
+        RET_CHECK_BLACKLIST(-1, ret, "msg_reqconf");
         break;
     case MT_LOGIN:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_LOGIN 消息.", connect_stat->fd);
@@ -45,13 +47,6 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
     default:
         break;
     }
-
-    random_gen_str(buf, 30, connect_stat->fd);
-    printf("%s\n", buf);
-
-    bzero(buf, sizeof(buf));
-    rsa_rsa2str(buf, program_stat->public_rsa, PUBKEY);
-    printf("%s\n", buf);
 
     return 0;
 }
