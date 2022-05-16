@@ -17,9 +17,9 @@ int msg_reqconf(struct connect_stat_t *connect_stat, struct program_stat_t *prog
     RET_CHECK_BLACKLIST(-1, ret, "recv_n");
 
     // 处理确认码
-    char sendbuf_confirm[30] = {0};
-    int sendbuf_confirmlen = sizeof(sendbuf_confirm);
-    random_gen_str(sendbuf_confirm, sendbuf_confirmlen, connect_stat->fd);
+    int sendbuf_confirmlen = 30;
+    random_gen_str(connect_stat->confirm, sendbuf_confirmlen, connect_stat->fd);
+    logging(LOG_DEBUG, connect_stat->confirm);
 
     // 处理公钥
     char sendbuf_rsastr[4096] = {0};
@@ -37,7 +37,7 @@ int msg_reqconf(struct connect_stat_t *connect_stat, struct program_stat_t *prog
     RET_CHECK_BLACKLIST(-1, ret, "send");
     ret = send(connect_stat->fd, &sendbuf_confirmlen, sizeof(sendbuf_confirmlen), 0);
     RET_CHECK_BLACKLIST(-1, ret, "send");
-    ret = send(connect_stat->fd, sendbuf_confirm, sendbuf_confirmlen, 0);
+    ret = send(connect_stat->fd, connect_stat->confirm, sendbuf_confirmlen, 0);
     RET_CHECK_BLACKLIST(-1, ret, "send");
     ret = send(connect_stat->fd, &sendbuf_rsastrlen, sizeof(sendbuf_rsastrlen), 0);
     RET_CHECK_BLACKLIST(-1, ret, "send");
