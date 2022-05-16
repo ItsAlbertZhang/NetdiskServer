@@ -7,7 +7,7 @@ static int generate_rsa_keys(const char *private_key_filename, const char *publi
 // 检查 rsa 密钥是否成对
 static int check_rsa_keys(const char *private_key_filename, const char *public_key_filename);
 // 从密钥文件获取 rsa 结构体
-static int get_rsa_from_file(RSA **private_rsa, RSA **public_rsa, const char *private_key_filename, const char *public_key_filename);
+static int get_rsa_from_file(RSA **rsa, const char *rsa_key_filename, int rsa_type);
 
 int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir) {
     int ret = 0;
@@ -23,7 +23,9 @@ int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir) {
         ret = check_rsa_keys(private_key_filename, public_key_filename);
         if (0 == ret) {
             logging(LOG_INFO, "服务端运行所需密钥验证完毕.");
-            ret = get_rsa_from_file(private_rsa, public_rsa, private_key_filename, public_key_filename);
+            ret = get_rsa_from_file(private_rsa, private_key_filename, PRIKEY);
+            RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
+            ret = get_rsa_from_file(public_rsa, public_key_filename, PUBKEY);
             RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
             return 0;
         }
@@ -36,7 +38,9 @@ int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir) {
     RET_CHECK_BLACKLIST(-1, ret, "generate_rsa_keys");
     logging(LOG_WARN, "服务端运行所需密钥不存在或不成对, 已重新生成密钥.");
 
-    ret = get_rsa_from_file(private_rsa, public_rsa, private_key_filename, public_key_filename);
+    ret = get_rsa_from_file(private_rsa, private_key_filename, PRIKEY);
+    RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
+    ret = get_rsa_from_file(public_rsa, public_key_filename, PUBKEY);
     RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
 
     return 0;
@@ -93,7 +97,10 @@ static int check_rsa_keys(const char *private_key_filename, const char *public_k
 
     // 从密钥文件获取 rsa
     RSA *private_rsa = NULL, *public_rsa = NULL;
-    ret = get_rsa_from_file(&private_rsa, &public_rsa, private_key_filename, public_key_filename);
+    ret = get_rsa_from_file(&private_rsa, private_key_filename, PRIKEY);
+    RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
+    ret = get_rsa_from_file(&public_rsa, public_key_filename, PUBKEY);
+    RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
 
     unsigned char source[256] = {0};
     unsigned char plaintext[1024] = {0};
@@ -111,28 +118,20 @@ static int check_rsa_keys(const char *private_key_filename, const char *public_k
     return ret;
 }
 
-static int get_rsa_from_file(RSA **private_rsa, RSA **public_rsa, const char *private_key_filename, const char *public_key_filename) {
+static int get_rsa_from_file(RSA **rsa, const char *rsa_key_filename, int rsa_type) {
     int ret = 0;
-    
+
     // 打开 RSA 密钥文件
-    int private_fd = open(private_key_filename, O_RDWR);
-    RET_CHECK_BLACKLIST(-1, private_fd, "open");
-    int public_fd = open(public_key_filename, O_RDWR);
-    RET_CHECK_BLACKLIST(-1, public_fd, "open");
+    int fd = open(rsa_key_filename, O_RDWR);
+    RET_CHECK_BLACKLIST(-1, fd, "open");
 
     // 从文件中获取 RSA 信息
-    char buf[4096];
-    bzero(buf, sizeof(buf));
-    ret = read(private_fd, buf, sizeof(buf));
+    char buf[4096] = {0};
+    ret = read(fd, buf, sizeof(buf));
     RET_CHECK_BLACKLIST(-1, ret, "read");
-    rsa_str2rsa(buf, private_rsa, PRIKEY);
-    bzero(buf, sizeof(buf));
-    ret = read(public_fd, buf, sizeof(buf));
-    RET_CHECK_BLACKLIST(-1, ret, "read");
-    rsa_str2rsa(buf, public_rsa, PUBKEY);
+    rsa_str2rsa(buf, rsa, rsa_type);
 
-    close(private_fd);
-    close(public_fd);
+    close(fd);
 
     return 0;
 }
