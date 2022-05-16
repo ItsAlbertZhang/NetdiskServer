@@ -39,15 +39,22 @@ int rsa_rsa2str(char *str, RSA *rsa, int rsa_type) {
     BIO *bio = BIO_new(BIO_s_mem());
     if (rsa_type) {
         ret = PEM_write_bio_RSAPublicKey(bio, rsa);
-        RET_CHECK_BLACKLIST(0, ret, "PEM_write_bio_RSAPublicKey")
+        if (0 == ret) {
+            BIO_free_all(bio);
+            return -1;
+        }
     } else {
         ret = PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
-        RET_CHECK_BLACKLIST(0, ret, "PEM_write_bio_RSAPrivateKey")
+        if (0 == ret) {
+            BIO_free_all(bio);
+            return -1;
+        }
     }
     int keylen = BIO_pending(bio);
     bzero(str, keylen + 1);
     ret = BIO_read(bio, str, keylen);
     if (ret < 0 || ret == 0) {
+        BIO_free_all(bio);
         return -1;
     }
 
@@ -62,14 +69,21 @@ int rsa_str2rsa(const char *str, RSA **rsa, int rsa_type) {
     BIO *bio = BIO_new(BIO_s_mem());
     ret = BIO_write(bio, str, strlen(str));
     if (ret < 0 || ret == 0) {
+        BIO_free_all(bio);
         return -1;
     }
     if (rsa_type) {
         rsa_ret = PEM_read_bio_RSAPublicKey(bio, rsa, NULL, NULL);
-        RET_CHECK_BLACKLIST(NULL, rsa_ret, "PEM_read_bio_RSAPublicKey");
+        if (NULL == rsa_ret) {
+            BIO_free_all(bio);
+            return -1;
+        }
     } else {
         rsa_ret = PEM_read_bio_RSAPrivateKey(bio, rsa, NULL, NULL);
-        RET_CHECK_BLACKLIST(NULL, rsa_ret, "PEM_read_bio_RSAPrivateKey");
+        if (NULL == rsa_ret) {
+            BIO_free_all(bio);
+            return -1;
+        }
     }
 
     BIO_free_all(bio);
