@@ -25,4 +25,7 @@ int connect_msg_fetchtype(int connect_fd, void *buf);
 // 下发验证请求
 int msg_reqconf(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
 
+// 注册请求
+int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
+
 #endif /* __CONNECT_MSG_H__ */
