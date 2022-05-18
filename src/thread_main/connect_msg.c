@@ -26,7 +26,7 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
         break;
     case MT_REGIST:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_REGIST 消息.", connect_stat->fd);
-        logging(LOG_DEBUG, logbuf);
+        logging(LOG_INFO, logbuf);
         ret = msg_regist(connect_stat, program_stat);
         break;
     case MT_LOGIN:

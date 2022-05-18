@@ -1,8 +1,9 @@
 #ifndef __HEAD_H__
 #define __HEAD_H__
 
-// #define _GNU_SOURCE
+#define _GNU_SOURCE // crypt
 #include <arpa/inet.h>
+#include <crypt.h>
 // #include <dirent.h>
 // #include <errno.h>
 #include <fcntl.h>

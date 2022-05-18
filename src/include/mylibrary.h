@@ -68,4 +68,9 @@ int epoll_del(int fd);
 // 生成随机字符串
 int random_gen_str(char *str, int len, int seed);
 
+// mysql.c
+
+// 查询 MySQL 数据库: 在指定表的指定字段查询某个值的出现次数
+int libmysql_dupnum_value(MYSQL *mysql_connect, const char *tbname, const char *fieldname, const char *value);
+
 #endif /* __MYLIBRARY_H__ */

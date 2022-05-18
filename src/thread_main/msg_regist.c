@@ -59,19 +59,45 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
     ret = msg_regist_recv(connect_stat->fd, &recvbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_regist_recv");
 
-    // 以下部分未完善, 需要借助数据库中的用户信息表方可实现功能
-    char buf[1024] = {0};
-    if (recvbuf.pwd_len) {
-        rsa_decrypt(buf, recvbuf.pwd_ciphertext, program_stat->private_rsa, PRIKEY);
+    // 查询数据库: 该用户名是否已存在
+    int dupnum = libmysql_dupnum_value(program_stat->mysql_connect, "user_auth", "username", recvbuf.username);
+    if (0 == dupnum) { // 用户名未被注册
+        sendbuf.approve = APPROVE;
+        // 如果是正式注册请求, 则应对密码段进行处理
+        if (recvbuf.pwd_len) {
+            // 对接收到的密文进行 rsa 解密处理
+            char pwd_plaintext[32] = {0};
+            rsa_decrypt(pwd_plaintext, recvbuf.pwd_ciphertext, program_stat->private_rsa, PRIKEY); // 对密码进行 rsa 解密
+            for (int i = 0; i < strlen(pwd_plaintext); i++) {
+                pwd_plaintext[i] = pwd_plaintext[i] ^ connect_stat->confirm[i]; // 对密码进行确认码异或, 得到密码明文原文
+            }
+            // 对解密得到的明文进行 SHA512 加密处理
+            char salt[16] = "$6$";                                    // 盐值的 id 为6, 代表采用 SHA512 算法
+            random_gen_str(&salt[strlen(salt)], 8, connect_stat->fd); // 生成 8 个字节长的随机盐值
+            /* crypt 函数需要使用的定义 #define _XOPEN_SOURCE 会使 ftruncate 函数与 readlink 函数不可用. 因此此处使用其可重入版本 crypt_r, 该版本需要使用定义 #define _GNU_SOURCE*/
+            struct crypt_data pwd_ciphertext_data;
+            bzero(&pwd_ciphertext_data, sizeof(pwd_ciphertext_data));
+            char *pwd_ciphertext = crypt_r(pwd_plaintext, salt, &pwd_ciphertext_data);
+            // 将用户信息插入 MySQL 数据库
+            char query[1024] = {0};
+            sprintf(query, "INSERT INTO user_auth(username, salt, pwd) VALUES('%s', '%s', '%s');", recvbuf.username, salt, pwd_ciphertext);
+            // printf("%s\n", query);
+            ret = mysql_query(program_stat->mysql_connect, query);
+            RET_CHECK_BLACKLIST(-1, ret, "mysql_query");
+            // printf("affected rows: %ld.\n", (long)mysql_affected_rows(program_stat->mysql_connect));
+            // 日志
+            char buf[1024] = {0};
+            sprintf(buf, "已接受 fd 为 %d 的用户名为 %s 的注册请求.", connect_stat->fd, recvbuf.username);
+            logging(LOG_INFO, buf);
+        }
+    } else { // 用户名已存在, 不能注册
+        sendbuf.approve = DISAPPROVE;
+        char buf[1024] = {0};
+        sprintf(buf, "已拒绝 fd 为 %d 的用户名为 %s 的注册请求.", connect_stat->fd, recvbuf.username);
+        logging(LOG_INFO, buf);
     }
-    for(int i = 0; i < strlen(buf); i++) {
-        buf[i] = buf[i] ^ connect_stat->confirm[i];
-    }
-    char bufp[1024] = {0};
-    sprintf(bufp, "%s %s", recvbuf.username, buf);
-    logging(LOG_DEBUG, bufp);
 
-    sendbuf.approve = APPROVE; // 在功能实现之前为方便 DEBUG 统一回复同意
+    // 向客户端发送消息
     ret = msg_regist_send(connect_stat->fd, &sendbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_regist_send");
 

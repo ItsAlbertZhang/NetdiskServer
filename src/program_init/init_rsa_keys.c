@@ -31,7 +31,7 @@ int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir) {
         ret = -1;
     }
     if (0 == ret) {
-        logging(LOG_INFO, "客户端运行所需密钥验证完毕.");
+        logging(LOG_INFO, "服务端运行所需密钥验证完毕.");
         return 0;
     } else {
         // 两个文件至少有其一不存在, 或两个密钥不成对, 重新生成密钥
@@ -39,7 +39,7 @@ int init_rsa_keys(RSA **private_rsa, RSA **public_rsa, const char *config_dir) {
         unlink(public_key_filename);
         ret = generate_rsa_keys(private_key_filename, public_key_filename);
         RET_CHECK_BLACKLIST(-1, ret, "generate_rsa_keys");
-        logging(LOG_WARN, "客户端运行所需密钥不存在或不成对, 已重新生成密钥.");
+        logging(LOG_WARN, "服务端运行所需密钥不存在或不成对, 已重新生成密钥.");
 
         ret = get_rsa_from_file(private_rsa, private_key_filename, PRIKEY);
         RET_CHECK_BLACKLIST(-1, ret, "get_rsa_from_file");
