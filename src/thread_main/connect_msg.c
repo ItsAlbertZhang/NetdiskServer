@@ -22,16 +22,25 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_REQCONF 消息.", connect_stat->fd);
         logging(LOG_DEBUG, logbuf);
         ret = msg_reqconf(connect_stat, program_stat);
-        RET_CHECK_BLACKLIST(-1, ret, "msg_reqconf");
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_reqconf 执行出错.");
+        }
         break;
     case MT_REGIST:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_REGIST 消息.", connect_stat->fd);
         logging(LOG_INFO, logbuf);
         ret = msg_regist(connect_stat, program_stat);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_regist 执行出错.");
+        }
         break;
     case MT_LOGIN:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_LOGIN 消息.", connect_stat->fd);
         logging(LOG_DEBUG, logbuf);
+        ret = msg_login(connect_stat, program_stat);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_login 执行出错.");
+        }
         break;
     case MT_RECONN:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_RECONN 消息.", connect_stat->fd);

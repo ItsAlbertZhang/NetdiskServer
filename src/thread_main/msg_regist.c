@@ -90,14 +90,14 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
             sprintf(logbuf, "已接受 fd 为 %d 的用户名为 %s 的注册请求.", connect_stat->fd, recvbuf.username);
             logging(LOG_INFO, logbuf);
             // 获取用户 user_id
-            char userid[10] = {0};
-            char *userid_p[] = {&userid[0]};
-            ret = libmysql_query_1col(program_stat->mysql_connect, "user_auth", "user_id", "username", recvbuf.username, userid_p, 1);
+            char user_id_str[10] = {0};
+            char *user_id_p[] = {&user_id_str[0]};
+            ret = libmysql_query_1col(program_stat->mysql_connect, "user_auth", "user_id", "username", recvbuf.username, user_id_p, 1);
             if (1 != ret) {
                 RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1col");
             } else {
-                connect_stat->user_id = atoi(userid);
-                sprintf(logbuf, "成功获取用户名为 %s 的 user_id 为 %d", recvbuf.username, connect_stat->user_id);
+                connect_stat->user_id = atoi(user_id_str);
+                sprintf(logbuf, "成功获取用户名为 %s 的 user_id 为 %d.", recvbuf.username, connect_stat->user_id);
                 logging(LOG_DEBUG, logbuf);
             }
         }
