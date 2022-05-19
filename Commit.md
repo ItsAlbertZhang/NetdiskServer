@@ -83,3 +83,7 @@
 ##### 2205191050
 
 - Update README.md
+
+#### 2205191251
+
+- 实现 REQCONF 消息对 DUPCONN 消息的兼容, 现在 REQCONF 消息会交换 token 信息, 为 DUPCONN 消息做准备.

@@ -13,6 +13,7 @@ struct connect_stat_t {
     int connect_timer_index; // 连接所在的计时器位置下标
     int connect_timer_real;  // 连接应在的计时器位置下标
     char confirm[64];        // 连接的确认码
+    time_t init_time;     // 初次连接的时间
 };
 
 // 哈希表结点数据部分

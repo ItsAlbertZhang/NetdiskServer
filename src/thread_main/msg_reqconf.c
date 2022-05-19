@@ -6,22 +6,30 @@
 
 struct msg_reqconf_recvbuf_t {
     char msgtype;             // 消息类型
+    int clientpubrsa_len;     // 下一字段的长度
+    char clientpubrsa[1024];  // 客户端公钥字符串
     int serverpub_md5_len;    // 下一字段的长度
     char serverpub_md5[1024]; // 客户端本地存储的服务端公钥字符串的 MD5 校验码
 };
 
 struct msg_reqconf_sendbuf_t {
-    char msgtype;             // 消息类型
-    int confirm_len;          // 下一字段的长度
-    char confirm[64];         // 会话确认码
-    int serverpub_str_len;    // 下一字段的长度
-    char serverpub_str[1024]; // 服务端公钥. 当无需传输时, 此字段与上一字段置空.
+    char msgtype;                // 消息类型
+    int confirm_len;             // 下一字段的长度
+    char confirm[64];            // 会话确认码
+    int token_len;               // 下一字段的长度
+    char token_ciphertext[1024]; // token 密文, 用于客户端建立新连接时的短验证
+    int serverpub_str_len;       // 下一字段的长度
+    char serverpub_str[1024];    // 服务端公钥. 当无需传输时, 此字段与上一字段置空.
 };
 
 static int msg_reqconf_recv(int connect_fd, struct msg_reqconf_recvbuf_t *recvbuf) {
     int ret = 0;
 
     bzero(recvbuf, sizeof(struct msg_reqconf_recvbuf_t));
+    ret = recv_n(connect_fd, &recvbuf->clientpubrsa_len, sizeof(recvbuf->clientpubrsa_len), 0);
+    RET_CHECK_BLACKLIST(-1, ret, "recv");
+    ret = recv_n(connect_fd, recvbuf->clientpubrsa, recvbuf->clientpubrsa_len, 0);
+    RET_CHECK_BLACKLIST(-1, ret, "recv");
     ret = recv_n(connect_fd, &recvbuf->serverpub_md5_len, sizeof(recvbuf->serverpub_md5_len), 0);
     RET_CHECK_BLACKLIST(-1, ret, "recv");
     ret = recv_n(connect_fd, recvbuf->serverpub_md5, recvbuf->serverpub_md5_len, 0);
@@ -37,6 +45,8 @@ static int msg_reqconf_send(int connect_fd, struct msg_reqconf_sendbuf_t *sendbu
     ret = send(connect_fd, &sendbuf->msgtype, sizeof(sendbuf->msgtype), MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
     ret = send(connect_fd, &sendbuf->confirm_len, sizeof(sendbuf->confirm_len) + sendbuf->confirm_len, MSG_NOSIGNAL);
+    RET_CHECK_BLACKLIST(-1, ret, "send");
+    ret = send(connect_fd, &sendbuf->token_len, sizeof(sendbuf->token_len) + sendbuf->token_len, MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
     ret = send(connect_fd, &sendbuf->serverpub_str_len, sizeof(sendbuf->serverpub_str_len) + sendbuf->serverpub_str_len, MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
@@ -64,7 +74,20 @@ int msg_reqconf(struct connect_stat_t *connect_stat, struct program_stat_t *prog
     strcpy(connect_stat->confirm, sendbuf.confirm); // 将确认码复制到连接信息中
     logging(LOG_DEBUG, connect_stat->confirm);
 
-    // 处理公钥
+    // 处理传来的客户端公钥
+    RSA *clientrsa = NULL;
+    ret = rsa_str2rsa(recvbuf.clientpubrsa, &clientrsa, PUBKEY);
+    RET_CHECK_BLACKLIST(-1, ret, "rsa_str2rsa");
+
+    // 生成 token 并加密
+    char token[64] = {0};
+    connect_stat->init_time = time(NULL);
+    sprintf(token, "%d %ld", connect_stat->fd, connect_stat->init_time);
+    logging(LOG_DEBUG, token);
+    sendbuf.token_len = rsa_encrypt(token, sendbuf.token_ciphertext, clientrsa, PUBKEY);
+    RET_CHECK_BLACKLIST(-1, sendbuf.token_len, "rsa_encrypt");
+
+    // 处理传来的服务端公钥 MD5 校验码
     ret = rsa_rsa2str(sendbuf.serverpub_str, program_stat->public_rsa, PUBKEY);
     RET_CHECK_BLACKLIST(-1, ret, "rsa_rsa2str");
     // 对比计算得出的服务端公钥 MD5 校验码与客户端发来的信息中的校验码
