@@ -71,7 +71,7 @@ int msg_reqconf(struct connect_stat_t *connect_stat, struct program_stat_t *prog
     // 生成确认码
     sendbuf.confirm_len = 30;
     random_gen_str(sendbuf.confirm, sendbuf.confirm_len, connect_stat->fd);
-    strcpy(connect_stat->confirm, sendbuf.confirm); // 将确认码复制到连接信息中
+    strcpy(connect_stat->confirm, sendbuf.confirm); // 将确认码存入连接状态中
     logging(LOG_DEBUG, connect_stat->confirm);
 
     // 处理传来的客户端公钥
@@ -81,7 +81,7 @@ int msg_reqconf(struct connect_stat_t *connect_stat, struct program_stat_t *prog
 
     // 生成 token 并加密
     char token[64] = {0};
-    connect_stat->init_time = time(NULL);
+    connect_stat->init_time = time(NULL); // 将初次连接时间存入连接状态中
     sprintf(token, "%d %ld", connect_stat->fd, connect_stat->init_time);
     logging(LOG_DEBUG, token);
     sendbuf.token_len = rsa_encrypt(token, sendbuf.token_ciphertext, clientrsa, PUBKEY);

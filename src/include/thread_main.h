@@ -13,7 +13,9 @@ struct connect_stat_t {
     int connect_timer_index; // 连接所在的计时器位置下标
     int connect_timer_real;  // 连接应在的计时器位置下标
     char confirm[64];        // 连接的确认码
-    time_t init_time;     // 初次连接的时间
+    time_t init_time;        // 初次连接的时间
+    int user_id;             // 用户 id
+    int pwd_id;              // 当前工作目录 id
 };
 
 // 哈希表结点数据部分

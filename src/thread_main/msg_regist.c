@@ -87,15 +87,24 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
             RET_CHECK_BLACKLIST(-1, ret, "mysql_query");
             // printf("affected rows: %ld.\n", (long)mysql_affected_rows(program_stat->mysql_connect));
             // 日志
-            char buf[1024] = {0};
-            sprintf(buf, "已接受 fd 为 %d 的用户名为 %s 的注册请求.", connect_stat->fd, recvbuf.username);
-            logging(LOG_INFO, buf);
+            sprintf(logbuf, "已接受 fd 为 %d 的用户名为 %s 的注册请求.", connect_stat->fd, recvbuf.username);
+            logging(LOG_INFO, logbuf);
+            // 获取用户 user_id
+            char userid[10] = {0};
+            char *userid_p[] = {&userid[0]};
+            ret = libmysql_query_1col(program_stat->mysql_connect, "user_auth", "user_id", "username", recvbuf.username, userid_p, 1);
+            if (1 != ret) {
+                RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1col");
+            } else {
+                connect_stat->user_id = atoi(userid);
+                sprintf(logbuf, "成功获取用户名为 %s 的 user_id 为 %d", recvbuf.username, connect_stat->user_id);
+                logging(LOG_DEBUG, logbuf);
+            }
         }
     } else { // 用户名已存在, 不能注册
         sendbuf.approve = DISAPPROVE;
-        char buf[1024] = {0};
-        sprintf(buf, "已拒绝 fd 为 %d 的用户名为 %s 的注册请求.", connect_stat->fd, recvbuf.username);
-        logging(LOG_INFO, buf);
+        sprintf(logbuf, "已拒绝 fd 为 %d 的用户名为 %s 的注册请求.", connect_stat->fd, recvbuf.username);
+        logging(LOG_INFO, logbuf);
     }
 
     // 向客户端发送消息
