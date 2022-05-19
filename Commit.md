@@ -79,3 +79,7 @@
 ##### 2205191048
 
 - Update Manual.md.
+
+##### 2205191050
+
+- Update README.md

@@ -10,7 +10,7 @@ Netdisk server project practice.
 
 本项目运行在 Linux 环境下, 测试环境为 Ubuntu 20.04.
 
-依赖: `-lpthread` , `-lmysqlclient` , `-lssl` , `-lcrypto`.
+依赖: `-lpthread` , `-lmysqlclient` , `-lssl` , `-lcrypto` , `-lcrypt` .
 
 测试环境下为: apt 获取 mysqlclient 软件包; 编译安装 openssl 1.1.1 软件包.
 
