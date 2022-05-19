@@ -38,7 +38,7 @@ int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, 
     return 0;
 }
 
-int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr) {
+int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct connect_sleep_node *connect_sleep) {
     int ret = 0;
 
     sprintf(logbuf, "已断开 %d 号连接.", connect_stat->fd);
@@ -48,8 +48,10 @@ int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_ha
     RET_CHECK_BLACKLIST(-1, ret, "epoll_del");
     close(connect_stat->fd); // 关闭连接
     RET_CHECK_BLACKLIST(-1, ret, "close");
-    bzero(connect_stat, sizeof(struct connect_stat_t)); // 清空状态
-    logging(LOG_INFO, logbuf);
+
+    connect_sleep_fall(connect_sleep, connect_stat);
+    // bzero(connect_stat, sizeof(struct connect_stat_t)); // 清空状态
+    // logging(LOG_INFO, logbuf);
 
     return 0;
 }

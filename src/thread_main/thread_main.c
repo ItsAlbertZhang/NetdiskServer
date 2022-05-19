@@ -15,6 +15,9 @@ int thread_main_handle(struct program_stat_t *program_stat) {
     struct connect_stat_t *connect_stat_arr = (struct connect_stat_t *)malloc(sizeof(struct connect_stat_t) * max_connect_num);
     bzero(connect_stat_arr, sizeof(struct connect_stat_t) * max_connect_num); // 清空连接状态
 
+    // 休眠连接链表
+    struct connect_sleep_node *connect_sleep = connect_sleep_init();
+
     // malloc 结构体数组: 时间轮定时器 struct connect_timer_hashnode; 每个数组成员均为一个时间轮片, 数组成员个数即为时间轮一轮循环的秒数.
     // 数组成员下标是时间的除留余法散列函数, 整个时间轮定时器采用拉链法哈希构建.每个数组成员实际上为哈希表拉链的头结点.
     struct connect_timer_hashnode *connect_timer_arr = (struct connect_timer_hashnode *)malloc(sizeof(struct connect_timer_hashnode) * AUTO_DISCONNECT_SECOND);
@@ -39,14 +42,14 @@ int thread_main_handle(struct program_stat_t *program_stat) {
                 RET_CHECK_BLACKLIST(-1, ret, "connect_init_handle");
             } else { //  有来自已有连接的消息
                 // 处理消息
-                ret = connect_msg_handle(&connect_stat_arr[events[i].data.fd % max_connect_num], connect_timer_arr, program_stat);
+                ret = connect_msg_handle(&connect_stat_arr[events[i].data.fd % max_connect_num], connect_timer_arr, program_stat, connect_sleep);
                 RET_CHECK_BLACKLIST(-1, ret, "connect_msg_handle");
                 // 处理时间轮定时器
                 ret = connect_timer_update(&connect_stat_arr[events[i].data.fd % max_connect_num], connect_timer_arr);
             }
         }
         // 处理下一秒对应的时间轮片上的连接
-        ret = connect_timer_handle(connect_timer_arr);
+        ret = connect_timer_handle(connect_timer_arr, connect_sleep);
         RET_CHECK_BLACKLIST(-1, ret, "connect_timer_handle");
     }
 }

@@ -4,7 +4,7 @@
 #include "mylibrary.h"
 #include "thread_main.h"
 
-int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct program_stat_t *program_stat) {
+int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct program_stat_t *program_stat, struct connect_sleep_node *connect_sleep) {
     int ret = 0;
     char buf[1024] = {0};
 
@@ -13,7 +13,7 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
     RET_CHECK_BLACKLIST(-1, ret, "connect_msg_fetchtype");
     if (0 == ret) {
         // 对方已断开连接
-        ret = connect_destory(connect_stat, connect_timer_arr);
+        ret = connect_destory(connect_stat, connect_timer_arr, connect_sleep);
         RET_CHECK_BLACKLIST(-1, ret, "connect_destory");
     }
 
@@ -42,9 +42,13 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
             logging(LOG_ERROR, "msg_login 执行出错.");
         }
         break;
-    case MT_RECONN:
+    case MT_DUPCONN:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_RECONN 消息.", connect_stat->fd);
         logging(LOG_DEBUG, logbuf);
+        ret = msg_dupconn(connect_stat, program_stat, connect_sleep);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_dupconn 执行出错.");
+        }
         break;
     case MT_COMM_S:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_COMM_S 消息.", connect_stat->fd);
