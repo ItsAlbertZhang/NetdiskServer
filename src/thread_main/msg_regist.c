@@ -78,9 +78,10 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
             struct crypt_data pwd_ciphertext_data;
             bzero(&pwd_ciphertext_data, sizeof(pwd_ciphertext_data));
             char *pwd_ciphertext = crypt_r(pwd_plaintext, salt, &pwd_ciphertext_data);
+            bzero(pwd_plaintext, sizeof(pwd_plaintext)); // 清空密码明文, 确保安全
             // 将用户信息插入 MySQL 数据库
             char query[1024] = {0};
-            sprintf(query, "INSERT INTO user_auth(username, salt, pwd) VALUES('%s', '%s', '%s');", recvbuf.username, salt, pwd_ciphertext);
+            sprintf(query, "INSERT INTO user_auth(username, pwd) VALUES('%s', '%s');", recvbuf.username, pwd_ciphertext);
             // printf("%s\n", query);
             ret = mysql_query(program_stat->mysql_connect, query);
             RET_CHECK_BLACKLIST(-1, ret, "mysql_query");
