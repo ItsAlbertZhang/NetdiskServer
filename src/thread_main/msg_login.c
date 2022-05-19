@@ -111,6 +111,7 @@ int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *progra
                     RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1col");
                 } else {
                     connect_stat->user_id = atoi(userid);
+                    connect_stat->pwd_id = 0;
                     sprintf(logbuf, "成功获取用户名为 %s 的 user_id 为 %d.", recvbuf.username, connect_stat->user_id);
                     logging(LOG_DEBUG, logbuf);
                 }
