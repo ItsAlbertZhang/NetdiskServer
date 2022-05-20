@@ -40,17 +40,14 @@ int connect_sleep_awake(struct connect_sleep_node *headnode, time_t init_time, s
     while (-1 == ret && thisnode->next) {
         if (thisnode->next->data.conn.init_time == init_time) {
             struct connect_sleep_node *awakenode = thisnode->next;
-            char connect_stat_addr_str[1024] = {0};
-            char connect_sleep_addr_str[1024] = {0};
-            strcpy(connect_stat_addr_str, inet_ntoa(connect_stat->addr.sin_addr));
-            strcpy(connect_sleep_addr_str, inet_ntoa(awakenode->data.conn.addr.sin_addr));
-            if (!strcmp(connect_stat_addr_str, connect_sleep_addr_str)) {
+            if (!memcmp(&connect_stat->addr.sin_addr, &awakenode->data.conn.addr.sin_addr, sizeof(connect_stat->addr.sin_addr))) {
                 memcpy(connect_stat->confirm, awakenode->data.conn.confirm, sizeof(connect_stat->confirm));
                 connect_stat->init_time = awakenode->data.conn.init_time;
                 connect_stat->user_id = awakenode->data.conn.user_id;
                 connect_stat->pwd_id = awakenode->data.conn.pwd_id;
 
                 thisnode->next = awakenode->next;
+                headnode->data.len -= 1;
                 free(awakenode);
                 ret = 0;
             }

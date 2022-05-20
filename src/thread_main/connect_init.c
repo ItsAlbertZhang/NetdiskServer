@@ -38,10 +38,9 @@ int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, 
     return 0;
 }
 
-int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct connect_sleep_node *connect_sleep) {
+int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct connect_sleep_node *connect_sleep, int gotosleep) {
     int ret = 0;
 
-    sprintf(logbuf, "已断开 %d 号连接.", connect_stat->fd);
     ret = connect_timer_out(connect_stat, connect_timer_arr); // 将连接从时间轮定时器中取出
     RET_CHECK_BLACKLIST(-1, ret, "connect_timer_out");
     ret = epoll_del(connect_stat->fd); // 取消 epoll 监听
@@ -49,9 +48,13 @@ int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_ha
     close(connect_stat->fd); // 关闭连接
     RET_CHECK_BLACKLIST(-1, ret, "close");
 
-    connect_sleep_fall(connect_sleep, connect_stat);
-    // bzero(connect_stat, sizeof(struct connect_stat_t)); // 清空状态
-    // logging(LOG_INFO, logbuf);
+    if (gotosleep) {
+        connect_sleep_fall(connect_sleep, connect_stat);
+    } else {
+        sprintf(logbuf, "%d 号连接已主动断开.", connect_stat->fd);
+        bzero(connect_stat, sizeof(struct connect_stat_t)); // 清空状态
+        logging(LOG_INFO, logbuf);
+    }
 
     return 0;
 }

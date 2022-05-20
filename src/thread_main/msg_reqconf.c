@@ -84,7 +84,7 @@ int msg_reqconf(struct connect_stat_t *connect_stat, struct program_stat_t *prog
     char token[64] = {0};
     connect_stat->init_time = time(NULL); // 将初次连接时间存入连接状态中
     sprintf(token, "%d %ld", connect_stat->fd, connect_stat->init_time);
-    sprintf(logbuf, "已为 fd 为 %d 的连接生成token: %s", connect_stat->fd, token);
+    sprintf(logbuf, "已为 fd 为 %d 的连接生成 token: %s", connect_stat->fd, token);
     logging(LOG_DEBUG, logbuf);
     sendbuf.token_len = rsa_encrypt(token, sendbuf.token_ciphertext, clientrsa, PUBKEY);
     RET_CHECK_BLACKLIST(-1, sendbuf.token_len, "rsa_encrypt");

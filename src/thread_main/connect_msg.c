@@ -13,7 +13,7 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
     RET_CHECK_BLACKLIST(-1, ret, "connect_msg_fetchtype");
     if (0 == ret) {
         // 对方已断开连接
-        ret = connect_destory(connect_stat, connect_timer_arr, connect_sleep);
+        ret = connect_destory(connect_stat, connect_timer_arr, connect_sleep, 0);
         RET_CHECK_BLACKLIST(-1, ret, "connect_destory");
     }
 

@@ -79,7 +79,7 @@ int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr, struc
         thisstat = thisnode->data.conn;
         if (-1 == thisnode->data.conn->connect_timer_real) {
             // 该连接在上一个时间轮循环中无活动
-            ret = connect_destory(thisstat, connect_timer_arr, connect_sleep);
+            ret = connect_destory(thisstat, connect_timer_arr, connect_sleep, 1);
             RET_CHECK_BLACKLIST(-1, ret, "connect_destory");
         } else {
             // 该连接在上一个时间轮循环中有活动
