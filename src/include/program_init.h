@@ -8,7 +8,7 @@
 #include "main.h"
 
 // 读取配置文件前, 获取配置文件目录
-int getconfig_init(char *dir, int dirlen);
+int init_getconfig(char *dir, int dirlen);
 // 读取配置文件
 int getconfig(const char *config_dir, const char *filename, char config[][MAX_CONFIG_LENGTH]);
 

@@ -1,7 +1,7 @@
 #include "head.h"
 #include "program_init.h"
 
-int getconfig_init(char *dir, int dirlen) {
+int init_getconfig(char *dir, int dirlen) {
     int ret = 0;
     // 如果使用 getcwd, 则获取到的为工作目录, 在不同目录下启动程序会导致工作目录不一致.
     ret = readlink("/proc/self/exe", dir, dirlen);

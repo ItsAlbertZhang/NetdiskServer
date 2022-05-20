@@ -8,7 +8,7 @@ int program_init(struct program_stat_t *program_stat) {
 
     // 获取配置文件目录
     char config_dir[1024];
-    ret = getconfig_init(config_dir, sizeof(config_dir));
+    ret = init_getconfig(config_dir, sizeof(config_dir));
     logging(LOG_INFO, "成功获取配置文件目录.");
 
     char config[MAX_CONFIG_ROWS][MAX_CONFIG_LENGTH];
