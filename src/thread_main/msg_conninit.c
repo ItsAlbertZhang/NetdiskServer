@@ -13,13 +13,12 @@ struct msg_conninit_recvbuf_t {
 };
 
 struct msg_conninit_sendbuf_t {
-    char msgtype;                // 消息类型
-    int confirm_len;             // 下一字段的长度
-    char confirm[64];            // 会话确认码
-    int token_len;               // 下一字段的长度
-    char token_ciphertext[1024]; // token 密文, 用于客户端建立新连接时的短验证
-    int serverpub_str_len;       // 下一字段的长度
-    char serverpub_str[1024];    // 服务端公钥. 当无需传输时, 此字段与上一字段置空.
+    char msgtype;            // 消息类型
+    int pretoken;            // token 前缀, 其实质为最近一次连接时服务端的文件描述符
+    int token_ciprsa_len;    // 下一字段的长度
+    char token_ciprsa[1024]; // token 密文
+    int serverpubrsa_len;    // 下一字段的长度
+    char serverpubrsa[1024]; // 服务端公钥. 当无需传输时, 此字段与上一字段置空.
 };
 
 static int msg_conninit_recv(int connect_fd, struct msg_conninit_recvbuf_t *recvbuf) {
@@ -44,11 +43,11 @@ static int msg_conninit_send(int connect_fd, struct msg_conninit_sendbuf_t *send
     sendbuf->msgtype = MT_CONNINIT;
     ret = send(connect_fd, &sendbuf->msgtype, sizeof(sendbuf->msgtype), MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
-    ret = send(connect_fd, &sendbuf->confirm_len, sizeof(sendbuf->confirm_len) + sendbuf->confirm_len, MSG_NOSIGNAL);
+    ret = send(connect_fd, &sendbuf->pretoken, sizeof(sendbuf->pretoken), MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
-    ret = send(connect_fd, &sendbuf->token_len, sizeof(sendbuf->token_len) + sendbuf->token_len, MSG_NOSIGNAL);
+    ret = send(connect_fd, &sendbuf->token_ciprsa_len, sizeof(sendbuf->token_ciprsa_len) + sendbuf->token_ciprsa_len, MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
-    ret = send(connect_fd, &sendbuf->serverpub_str_len, sizeof(sendbuf->serverpub_str_len) + sendbuf->serverpub_str_len, MSG_NOSIGNAL);
+    ret = send(connect_fd, &sendbuf->serverpubrsa_len, sizeof(sendbuf->serverpubrsa_len) + sendbuf->serverpubrsa_len, MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
 
     return 0;
@@ -68,34 +67,27 @@ int msg_conninit(struct connect_stat_t *connect_stat, struct program_stat_t *pro
     ret = msg_conninit_recv(connect_stat->fd, &recvbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_conninit_recv");
 
-    // 生成确认码
-    sendbuf.confirm_len = 30;
-    random_gen_str(sendbuf.confirm, sendbuf.confirm_len, connect_stat->fd);
-    strcpy(connect_stat->confirm, sendbuf.confirm); // 将确认码存入连接状态中
-    sprintf(logbuf, "已为 fd 为 %d 的连接生成确认码: %s", connect_stat->fd, connect_stat->confirm);
-    logging(LOG_DEBUG, logbuf);
-
     // 处理传来的客户端公钥
     RSA *clientrsa = NULL;
     ret = rsa_str2rsa(recvbuf.clientpubrsa, &clientrsa, PUBKEY);
     RET_CHECK_BLACKLIST(-1, ret, "rsa_str2rsa");
 
-    // 生成 token 并加密
-    char token[64] = {0};
-    connect_stat->init_time = time(NULL); // 将初次连接时间存入连接状态中
-    sprintf(token, "%d %ld", connect_stat->fd, connect_stat->init_time);
-    sprintf(logbuf, "已为 fd 为 %d 的连接生成 token: %s", connect_stat->fd, token);
+    // 生成 token
+    sendbuf.pretoken = connect_stat->fd;
+    random_gen_str(connect_stat->token, 30, connect_stat->fd);
+    sprintf(logbuf, "已为 fd 为 %d 的连接生成 token: %s", connect_stat->fd, connect_stat->token);
     logging(LOG_DEBUG, logbuf);
-    sendbuf.token_len = rsa_encrypt(token, sendbuf.token_ciphertext, clientrsa, PUBKEY);
-    RET_CHECK_BLACKLIST(-1, sendbuf.token_len, "rsa_encrypt");
+    // 将 token 加密
+    sendbuf.token_ciprsa_len = rsa_encrypt(connect_stat->token, sendbuf.token_ciprsa, clientrsa, PUBKEY);
+    RET_CHECK_BLACKLIST(-1, sendbuf.token_ciprsa_len, "rsa_encrypt");
 
     // 处理传来的服务端公钥 MD5 校验码
-    ret = rsa_rsa2str(sendbuf.serverpub_str, program_stat->public_rsa, PUBKEY);
+    ret = rsa_rsa2str(sendbuf.serverpubrsa, program_stat->public_rsa, PUBKEY);
     RET_CHECK_BLACKLIST(-1, ret, "rsa_rsa2str");
     // 对比计算得出的服务端公钥 MD5 校验码与客户端发来的信息中的校验码
-    if (strcmp(MD5(sendbuf.serverpub_str, strlen(sendbuf.serverpub_str), NULL), recvbuf.serverpub_md5)) {
+    if (strcmp(MD5(sendbuf.serverpubrsa, strlen(sendbuf.serverpubrsa), NULL), recvbuf.serverpub_md5)) {
         // strcmp 的结果不为 0, 说明两者不同, 此时需要向客户端发送公钥.
-        sendbuf.serverpub_str_len = strlen(sendbuf.serverpub_str);
+        sendbuf.serverpubrsa_len = strlen(sendbuf.serverpubrsa);
     }
 
     // 向客户端发送消息

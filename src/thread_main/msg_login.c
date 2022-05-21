@@ -5,11 +5,11 @@
 #include "thread_main.h"
 
 struct msg_login_recvbuf_t {
-    char msgtype;              // 消息类型
-    int username_len;          // 下一字段的长度
-    char username[30];         // 用户名
-    int pwd_len;               // 下一字段的长度
-    char pwd_ciphertext_rsa[1024]; // 密码密文
+    char msgtype;          // 消息类型
+    int username_len;      // 下一字段的长度
+    char username[30];     // 用户名
+    int pwd_ciprsa_len;    // 下一字段的长度
+    char pwd_ciprsa[1024]; // 密码密文
 };
 
 struct msg_login_sendbuf_t {
@@ -30,9 +30,9 @@ static int msg_login_recv(int connect_fd, struct msg_login_recvbuf_t *recvbuf) {
     RET_CHECK_BLACKLIST(-1, ret, "recv");
     ret = recv_n(connect_fd, recvbuf->username, recvbuf->username_len, 0);
     RET_CHECK_BLACKLIST(-1, ret, "recv");
-    ret = recv_n(connect_fd, &recvbuf->pwd_len, sizeof(recvbuf->pwd_len), 0);
+    ret = recv_n(connect_fd, &recvbuf->pwd_ciprsa_len, sizeof(recvbuf->pwd_ciprsa_len), 0);
     RET_CHECK_BLACKLIST(-1, ret, "recv");
-    ret = recv_n(connect_fd, recvbuf->pwd_ciphertext_rsa, recvbuf->pwd_len, 0);
+    ret = recv_n(connect_fd, recvbuf->pwd_ciprsa, recvbuf->pwd_ciprsa_len, 0);
     RET_CHECK_BLACKLIST(-1, ret, "recv");
 
     return 0;
@@ -42,6 +42,7 @@ static int msg_login_send(int connect_fd, struct msg_login_sendbuf_t *sendbuf) {
     int ret = 0;
 
     sendbuf->msgtype = MT_LOGIN;
+    printf("%ld\n", sizeof(struct msg_login_sendbuf_t));
     ret = send(connect_fd, sendbuf, sizeof(struct msg_login_sendbuf_t), MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
 
@@ -70,9 +71,9 @@ int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     } else {
         // 对接收到的密文进行 rsa 解密处理
         char pwd_plaintext[1024] = {0};
-        rsa_decrypt(pwd_plaintext, recvbuf.pwd_ciphertext_rsa, program_stat->private_rsa, PRIKEY); // 对密码进行 rsa 解密
+        rsa_decrypt(pwd_plaintext, recvbuf.pwd_ciprsa, program_stat->private_rsa, PRIKEY); // 对密码进行 rsa 解密
         for (int i = 0; i < strlen(pwd_plaintext); i++) {
-            pwd_plaintext[i] = pwd_plaintext[i] ^ connect_stat->confirm[i]; // 对密码进行确认码异或, 得到密码明文原文
+            pwd_plaintext[i] = pwd_plaintext[i] ^ connect_stat->token[i]; // 对密码进行 token 异或, 得到密码明文原文
         }
         // 数据库比对
         char pwd_ciphertext_sha512_mysql[128] = {0};
