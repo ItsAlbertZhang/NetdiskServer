@@ -9,7 +9,7 @@ struct msg_login_recvbuf_t {
     int username_len;          // 下一字段的长度
     char username[30];         // 用户名
     int pwd_len;               // 下一字段的长度
-    char pwd_ciphertext[1024]; // 密码密文
+    char pwd_ciphertext_rsa[1024]; // 密码密文
 };
 
 struct msg_login_sendbuf_t {
@@ -32,7 +32,7 @@ static int msg_login_recv(int connect_fd, struct msg_login_recvbuf_t *recvbuf) {
     RET_CHECK_BLACKLIST(-1, ret, "recv");
     ret = recv_n(connect_fd, &recvbuf->pwd_len, sizeof(recvbuf->pwd_len), 0);
     RET_CHECK_BLACKLIST(-1, ret, "recv");
-    ret = recv_n(connect_fd, recvbuf->pwd_ciphertext, recvbuf->pwd_len, 0);
+    ret = recv_n(connect_fd, recvbuf->pwd_ciphertext_rsa, recvbuf->pwd_len, 0);
     RET_CHECK_BLACKLIST(-1, ret, "recv");
 
     return 0;
@@ -70,14 +70,14 @@ int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     } else {
         // 对接收到的密文进行 rsa 解密处理
         char pwd_plaintext[1024] = {0};
-        rsa_decrypt(pwd_plaintext, recvbuf.pwd_ciphertext, program_stat->private_rsa, PRIKEY); // 对密码进行 rsa 解密
+        rsa_decrypt(pwd_plaintext, recvbuf.pwd_ciphertext_rsa, program_stat->private_rsa, PRIKEY); // 对密码进行 rsa 解密
         for (int i = 0; i < strlen(pwd_plaintext); i++) {
             pwd_plaintext[i] = pwd_plaintext[i] ^ connect_stat->confirm[i]; // 对密码进行确认码异或, 得到密码明文原文
         }
         // 数据库比对
-        char pwd_ciphertext[128] = {0};
-        char *pwd_ciphertext_p[] = {&pwd_ciphertext[0]};
-        ret = libmysql_query_1col(program_stat->mysql_connect, "user_auth", "pwd", "username", recvbuf.username, pwd_ciphertext_p, 1);
+        char pwd_ciphertext_sha512_mysql[128] = {0};
+        char *pwd_ciphertext_sha512_mysql_p[] = {&pwd_ciphertext_sha512_mysql[0]};
+        ret = libmysql_query_1col(program_stat->mysql_connect, "user_auth", "pwd", "username", recvbuf.username, pwd_ciphertext_sha512_mysql_p, 1);
         if (1 != ret) {
             RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1col");
         } else {
@@ -85,17 +85,16 @@ int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *progra
             // 获取盐值
             int cnt = 0, i = 0;
             for (i = 0; cnt < 3; i++) {
-                cnt += pwd_ciphertext[i] == '$';
+                cnt += pwd_ciphertext_sha512_mysql[i] == '$';
             }
             char salt[16] = {0};
-            strncpy(salt, pwd_ciphertext, i);
+            strncpy(salt, pwd_ciphertext_sha512_mysql, i);
             // 进行加密计算
-            struct crypt_data pwd_ciphertext_caldata;
-            bzero(&pwd_ciphertext_caldata, sizeof(pwd_ciphertext_caldata));
-            char *pwd_ciphertext_cal = crypt_r(pwd_plaintext, salt, &pwd_ciphertext_caldata);
+            char pwd_ciphertext_sha512_cal[128] = {0};
+            strcpy(pwd_ciphertext_sha512_cal, crypt(pwd_plaintext, salt));
             bzero(pwd_plaintext, sizeof(pwd_plaintext)); // 清空密码明文, 确保安全
             // 比对
-            if (strcmp(pwd_ciphertext, pwd_ciphertext_cal)) { // 密码错误
+            if (strcmp(pwd_ciphertext_sha512_mysql, pwd_ciphertext_sha512_cal)) { // 密码错误
                 sendbuf.approve = PWD_ERROR;
                 sprintf(logbuf, "已拒绝 fd 为 %d 的用户名为 %s 的登录请求: 密码错误.", connect_stat->fd, recvbuf.username);
                 logging(LOG_INFO, logbuf);
