@@ -86,7 +86,7 @@
 
 #### 2205191251
 
-- 实现 REQCONF 消息对 DUPCONN 消息的兼容, 现在 REQCONF 消息会交换 token 信息, 为 DUPCONN 消息做准备.
+- 实现 CONNINIT 消息对 DUPCONN 消息的兼容, 现在 CONNINIT 消息会交换 token 信息, 为 DUPCONN 消息做准备.
 
 #### 2205191504
 
@@ -143,3 +143,7 @@
 ##### 2205201900
 
 - Update Manual.md
+
+##### 2205211050
+
+- 修改了部分变量名, 使项目结构更清晰.

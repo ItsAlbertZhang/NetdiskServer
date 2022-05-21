@@ -18,12 +18,12 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
     }
 
     switch (buf[0]) {
-    case MT_REQCONF:
-        sprintf(logbuf, "接收到 fd 为 %d 的 MT_REQCONF 消息.", connect_stat->fd);
+    case MT_CONNINIT:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_CONNINIT 消息.", connect_stat->fd);
         logging(LOG_DEBUG, logbuf);
-        ret = msg_reqconf(connect_stat, program_stat);
+        ret = msg_conninit(connect_stat, program_stat);
         if (-1 == ret) {
-            logging(LOG_ERROR, "msg_reqconf 执行出错.");
+            logging(LOG_ERROR, "msg_conninit 执行出错.");
         }
         break;
     case MT_REGIST:

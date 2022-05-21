@@ -12,8 +12,8 @@ struct connect_stat_t {
     struct sockaddr_in addr; // 存放连接对端的地址信息. 初次赋值于 connect_init_handle.
     int connect_timer_index; // 连接所在的计时器位置下标. 初次赋值于 connect_timer_in.
     int connect_timer_real;  // 连接应在的计时器位置下标. 初次赋值于 connect_timer_in.
-    char confirm[64];        // 连接的确认码. 初次赋值于 msg_reqconf.
-    time_t init_time;        // 初次连接的时间. 初次赋值于 msg_reqconf.
+    char confirm[64];        // 连接的确认码. 初次赋值于 msg_conninit.
+    time_t init_time;        // 初次连接的时间. 初次赋值于 msg_conninit.
     int userid;              // 用户 id. 初次赋值于 msg_login 或 msg_regist.
     int pwd_id;              // 当前工作目录 id. 初次赋值于 msg_login 或 msg_regist.
 };
