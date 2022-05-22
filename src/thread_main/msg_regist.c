@@ -40,7 +40,9 @@ static int msg_regist_send(int connect_fd, struct msg_regist_sendbuf_t *sendbuf)
     int ret = 0;
 
     sendbuf->msgtype = MT_REGIST;
-    ret = send(connect_fd, sendbuf, sizeof(struct msg_regist_sendbuf_t), MSG_NOSIGNAL);
+    ret = send(connect_fd, &sendbuf->msgtype, sizeof(sendbuf->msgtype), MSG_NOSIGNAL);
+    RET_CHECK_BLACKLIST(-1, ret, "send");
+    ret = send(connect_fd, &sendbuf->approve, sizeof(sendbuf->approve), MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
 
     return 0;
