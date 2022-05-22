@@ -20,12 +20,9 @@ int libmysql_dupnum_value(MYSQL *mysql_connect, const char *tbname, const char *
     return ret;
 }
 
-int libmysql_query_1row(MYSQL *mysql_connect, const char *tbname, const char *fieldname, const char *value, char *row_p[], int row_cols) {
+int libmysql_query_1row(MYSQL *mysql_connect, const char *query_str, char *row_p[], int row_cols) {
     int i = 0;
     MYSQL_RES *result = NULL;
-
-    char query_str[1024] = {0};
-    sprintf(query_str, "SELECT * FROM `%s` WHERE `%s` = '%s';", tbname, fieldname, value);
 
     if (!mysql_query(mysql_connect, query_str)) {
         result = mysql_use_result(mysql_connect);
@@ -43,13 +40,10 @@ int libmysql_query_1row(MYSQL *mysql_connect, const char *tbname, const char *fi
     return i;
 }
 
-int libmysql_query_1col(MYSQL *mysql_connect, const char *tbname, const char *res_fieldname, const char *where_fieldname, const char *where_value, char *col_p[], int col_rows) {
+int libmysql_query_1col(MYSQL *mysql_connect, const char *query_str, char *col_p[], int col_rows) {
     int i = 0;
     MYSQL_RES *result = NULL;
     MYSQL_ROW row;
-
-    char query_str[1024] = {0};
-    sprintf(query_str, "SELECT `%s` FROM `%s` WHERE `%s` = '%s';", res_fieldname, tbname, where_fieldname, where_value);
 
     if (!mysql_query(mysql_connect, query_str)) {
         result = mysql_use_result(mysql_connect);

@@ -79,7 +79,9 @@ int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *progra
         // 数据库比对
         char pwd_ciphertext_sha512_mysql[128] = {0};
         char *pwd_ciphertext_sha512_mysql_p[] = {&pwd_ciphertext_sha512_mysql[0]};
-        ret = libmysql_query_1col(program_stat->mysql_connect, "user_auth", "pwd", "username", recvbuf.username, pwd_ciphertext_sha512_mysql_p, 1);
+        char query_str[1024] = {0};
+        sprintf(query_str, "SELECT `pwd` FROM `user_auth` WHERE `username` = '%s';", recvbuf.username);
+        ret = libmysql_query_1col(program_stat->mysql_connect, query_str, pwd_ciphertext_sha512_mysql_p, 1);
         if (1 != ret) {
             RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1col");
         } else {
@@ -107,7 +109,9 @@ int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *progra
                 // 获取用户 userid
                 char userid_s[10] = {0};
                 char *userid_sp[] = {&userid_s[0]};
-                ret = libmysql_query_1col(program_stat->mysql_connect, "user_auth", "userid", "username", recvbuf.username, userid_sp, 1);
+                char query_str[1024] = {0};
+                sprintf(query_str, "SELECT `userid` FROM `user_auth` WHERE `username` = '%s';", recvbuf.username);
+                ret = libmysql_query_1col(program_stat->mysql_connect, query_str, userid_sp, 1);
                 if (1 != ret) {
                     RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1col");
                 } else {

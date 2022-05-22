@@ -93,7 +93,9 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
             // 获取用户 userid
             char userid_str[10] = {0};
             char *userid_p[] = {&userid_str[0]};
-            ret = libmysql_query_1col(program_stat->mysql_connect, "user_auth", "userid", "username", recvbuf.username, userid_p, 1);
+            char query_str[1024] = {0};
+            sprintf(query_str, "SELECT `userid` FROM `user_auth` WHERE `username` = '%s';", recvbuf.username);
+            ret = libmysql_query_1col(program_stat->mysql_connect, query_str, userid_p, 1);
             if (1 != ret) {
                 RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1col");
             } else {
