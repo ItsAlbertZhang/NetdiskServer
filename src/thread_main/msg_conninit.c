@@ -45,9 +45,13 @@ static int msg_conninit_send(int connect_fd, struct msg_conninit_sendbuf_t *send
     RET_CHECK_BLACKLIST(-1, ret, "send");
     ret = send(connect_fd, &sendbuf->pretoken, sizeof(sendbuf->pretoken), MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
-    ret = send(connect_fd, &sendbuf->token_ciprsa_len, sizeof(sendbuf->token_ciprsa_len) + sendbuf->token_ciprsa_len, MSG_NOSIGNAL);
+    ret = send(connect_fd, &sendbuf->token_ciprsa_len, sizeof(sendbuf->token_ciprsa_len), MSG_NOSIGNAL);
+    RET_CHECK_BLACKLIST(-1, ret, "send");
+    ret = send(connect_fd, sendbuf->token_ciprsa, sendbuf->token_ciprsa_len, MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
     ret = send(connect_fd, &sendbuf->serverpubrsa_len, sizeof(sendbuf->serverpubrsa_len) + sendbuf->serverpubrsa_len, MSG_NOSIGNAL);
+    RET_CHECK_BLACKLIST(-1, ret, "send");
+    ret = send(connect_fd, sendbuf->serverpubrsa, sendbuf->serverpubrsa_len, MSG_NOSIGNAL);
     RET_CHECK_BLACKLIST(-1, ret, "send");
 
     return 0;

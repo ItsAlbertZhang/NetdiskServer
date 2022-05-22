@@ -120,7 +120,9 @@ static int connect_cpy(struct connect_stat_t *connect_stat, struct program_stat_
     struct connect_stat_t *token_stat = connect_stat + token_connect_diff;
     // 判断两者是否为同一个客户端以及 ip
     if (!strcmp(token_plain, token_stat->token) && !memcmp(&connect_stat->addr.sin_addr, &token_stat->addr.sin_addr, sizeof(struct in_addr))) {
-        memcpy(connect_stat->token, token_stat->token, sizeof(connect_stat->token) + sizeof(connect_stat->userid) + sizeof(connect_stat->pwd_id));
+        memcpy(connect_stat->token, token_stat->token, sizeof(connect_stat->token));
+        connect_stat->userid = token_stat->userid;
+        connect_stat->pwd_id = token_stat->pwd_id;
         ret = 0;
     }
     return ret;
