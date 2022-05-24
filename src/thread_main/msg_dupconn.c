@@ -66,7 +66,6 @@ int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *prog
     // 接收来自客户端的消息
     ret = msg_dupconn_recv(connect_stat->fd, &recvbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_dupconn_recv");
-    printf("here1\n");
 
     // 获取 token
     char token_plain[1024] = {0};
@@ -113,7 +112,6 @@ int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *prog
 
 static int connect_cpy(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, int pretoken, char *token_plain) {
     int ret = -1;
-    printf("here, pretoken = %d\n", pretoken);
     // 获取旧连接指针
     int max_connect_num = program_stat->thread_stat.pth_num + program_stat->thread_stat.thread_resource.queue->len;
     int token_connect_diff = (pretoken % max_connect_num) - (connect_stat->fd % max_connect_num);

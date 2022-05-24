@@ -23,6 +23,11 @@ int init_tcp(char *local_sign, int max_listen_num, const char *config_dir, char 
     int reuseaddr = 1;
     ret = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr));
     RET_CHECK_BLACKLIST(-1, sockfd, "setsockopt");
+    // 设置超时断连
+    struct timeval tv;
+    tv.tv_sec = 3; // recv 时 3 秒无响应返回 -1
+    tv.tv_usec = 0;
+    ret = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const void *)&tv, sizeof(tv));
     // 执行 bind
     ret = bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     RET_CHECK_BLACKLIST(-1, sockfd, "bind");
