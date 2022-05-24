@@ -4,22 +4,22 @@
 #include "mylibrary.h"
 #include "thread_main.h"
 
-struct msg_regist_recvbuf_t {
+struct msg_cs_pwd_recvbuf_t {
     char msgtype; // 消息类型
 };
 
-struct msg_regist_sendbuf_t {
+struct msg_cs_pwd_sendbuf_t {
     char msgtype;   // 消息类型
     int pwd_len;    // 下一字段的长度
     char pwd[1024]; // 当前工作目录
 };
 
-static int msg_cs_pwd_recv(int connect_fd, struct msg_regist_recvbuf_t *recvbuf) {
+static int msg_cs_pwd_recv(int connect_fd, struct msg_cs_pwd_recvbuf_t *recvbuf) {
     int ret = 0;
     return 0;
 }
 
-static int msg_cs_pwd_send(int connect_fd, struct msg_regist_sendbuf_t *sendbuf) {
+static int msg_cs_pwd_send(int connect_fd, struct msg_cs_pwd_sendbuf_t *sendbuf) {
     int ret = 0;
 
     sendbuf->msgtype = MT_CS_PWD;
@@ -39,8 +39,8 @@ int msg_cs_pwd(struct connect_stat_t *connect_stat, struct program_stat_t *progr
     int ret = 0;
 
     // 准备资源
-    struct msg_regist_recvbuf_t recvbuf;
-    struct msg_regist_sendbuf_t sendbuf;
+    struct msg_cs_pwd_recvbuf_t recvbuf;
+    struct msg_cs_pwd_sendbuf_t sendbuf;
     bzero(&sendbuf, sizeof(sendbuf));
     bzero(&recvbuf, sizeof(recvbuf));
 

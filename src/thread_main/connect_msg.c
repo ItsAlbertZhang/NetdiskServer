@@ -58,13 +58,13 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
             logging(LOG_ERROR, "msg_cs_pwd 执行出错.");
         }
         break;
-    case MT_COMM_S:
-        sprintf(logbuf, "接收到 fd 为 %d 的 MT_COMM_S 消息.", connect_stat->fd);
+    case MT_CS_LS:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_CS_LS 消息.", connect_stat->fd);
         logging(LOG_DEBUG, logbuf);
-        break;
-    case MT_COMM_L:
-        sprintf(logbuf, "接收到 fd 为 %d 的 MT_COMM_L 消息.", connect_stat->fd);
-        logging(LOG_DEBUG, logbuf);
+        ret = msg_cs_ls(connect_stat, program_stat);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_cs_ls 执行出错.");
+        }
         break;
     default:
         break;

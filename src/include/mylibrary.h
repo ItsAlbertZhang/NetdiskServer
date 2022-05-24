@@ -71,7 +71,7 @@ int random_gen_str(char *str, int len, int seed);
 // mysql.c
 
 // 查询 MySQL 数据库: 在指定表的指定字段查询某个值的出现次数
-int libmysql_dupnum_value(MYSQL *mysql_connect, const char *tbname, const char *fieldname, const char *value);
+int libmysql_query_count(MYSQL *mysql_connect, const char *query_str);
 
 // 查询 MySQL 数据库: 在指定表的指定字段查询某个值, 并将这个值所在的行内第 i 个字段的值填入 (char *)row_p[i]
 int libmysql_query_1row(MYSQL *mysql_connect, const char *query_str, char *row_p[], int row_cols);

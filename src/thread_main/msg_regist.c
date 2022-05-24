@@ -62,7 +62,9 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
     RET_CHECK_BLACKLIST(-1, ret, "msg_regist_recv");
 
     // 查询数据库: 该用户名是否已存在
-    int dupnum = libmysql_dupnum_value(program_stat->mysql_connect, "user_auth", "username", recvbuf.username);
+    char query_str[1024] = {0};
+    sprintf(query_str, "SELECT COUNT(*) FROM `user_auth` WHERE `username` = '%s';", recvbuf.username);
+    int dupnum = libmysql_query_count(program_stat->mysql_connect, query_str);
     if (0 == dupnum) { // 用户名未被注册
         sendbuf.approve = APPROVE;
         // 如果是正式注册请求, 则应对密码段进行处理
@@ -81,10 +83,10 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
             strcpy(pwd_ciphertext_sha512_cal, crypt(pwd_plaintext, salt));
             bzero(pwd_plaintext, sizeof(pwd_plaintext)); // 清空密码明文, 确保安全
             // 将用户信息插入 MySQL 数据库
-            char query[1024] = {0};
-            sprintf(query, "INSERT INTO user_auth(username, pwd) VALUES('%s', '%s');", recvbuf.username, pwd_ciphertext_sha512_cal);
-            // printf("%s\n", query);
-            ret = mysql_query(program_stat->mysql_connect, query);
+            char query_str[1024] = {0};
+            sprintf(query_str, "INSERT INTO user_auth(username, pwd) VALUES('%s', '%s');", recvbuf.username, pwd_ciphertext_sha512_cal);
+            // printf("%s\n", query_str);
+            ret = mysql_query(program_stat->mysql_connect, query_str);
             RET_CHECK_BLACKLIST(-1, ret, "mysql_query");
             // printf("affected rows: %ld.\n", (long)mysql_affected_rows(program_stat->mysql_connect));
             // 日志
@@ -93,7 +95,6 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
             // 获取用户 userid
             char userid_str[10] = {0};
             char *userid_p[] = {&userid_str[0]};
-            char query_str[1024] = {0};
             sprintf(query_str, "SELECT `userid` FROM `user_auth` WHERE `username` = '%s';", recvbuf.username);
             ret = libmysql_query_1col(program_stat->mysql_connect, query_str, userid_p, 1);
             if (1 != ret) {

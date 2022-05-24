@@ -29,9 +29,9 @@ int logging(int type, const char *str) {
         printf("\e[100m[%02d:%02d:%02d]\e[0m%s[%s]%s %s\n", now_tm.tm_hour + 8, now_tm.tm_min, now_tm.tm_sec, type_str_ff[type], type_str[type], type_str_fb[type], str);
 #ifdef PROD
         if (mysql_connect) {
-            char query[1024] = {0};
-            sprintf(query, "INSERT INTO log_main(server_sign, type, log) VALUES('%s', '%s', '%s');", local_sign, type_str[type], str);
-            ret = mysql_query(mysql_connect, query);
+            char query_str[1024] = {0};
+            sprintf(query_str, "INSERT INTO log_main(server_sign, type, log) VALUES('%s', '%s', '%s');", local_sign, type_str[type], str);
+            ret = mysql_query(mysql_connect, query_str);
         }
 #endif
     }

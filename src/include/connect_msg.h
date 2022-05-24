@@ -13,6 +13,7 @@ enum msg_type {
     MT_LOGIN,    // 登录请求
     MT_DUPCONN,  // 拷贝连接请求
     MT_CS_PWD,   // 短命令(command short): pwd
+    MT_CS_LS,    // 短命令(command short): ls
     MT_COMM_S,   // 短命令请求
     MT_COMM_L,   // 长命令请求
 };
@@ -37,5 +38,8 @@ int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *prog
 
 // pwd 命令请求
 int msg_cs_pwd(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
+
+// ls 命令请求
+int msg_cs_ls(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
 
 #endif /* __CONNECT_MSG_H__ */

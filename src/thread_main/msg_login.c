@@ -64,7 +64,9 @@ int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     RET_CHECK_BLACKLIST(-1, ret, "msg_regist_recv");
 
     // 查询数据库: 该用户名是否存在
-    int dupnum = libmysql_dupnum_value(program_stat->mysql_connect, "user_auth", "username", recvbuf.username);
+    char query_str[1024] = {0};
+    sprintf(query_str, "SELECT COUNT(*) FROM `user_auth` WHERE `username` = '%s';", recvbuf.username);
+    int dupnum = libmysql_query_count(program_stat->mysql_connect, query_str);
     if (0 == dupnum) {
         sendbuf.approve = USERNAME_NOT_EXIST; // 用户名不存在
         sprintf(logbuf, "已拒绝 fd 为 %d 的用户名为 %s 的登录请求: 该用户名不存在.", connect_stat->fd, recvbuf.username);
