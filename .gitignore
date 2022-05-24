@@ -5,6 +5,10 @@ netdisk_server
 *.pem
 *.pwd
 
+#file
+
+file/
+
 # .vscode
 .vscode/
 
