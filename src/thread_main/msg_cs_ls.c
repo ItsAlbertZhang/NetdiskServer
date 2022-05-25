@@ -54,6 +54,8 @@ int msg_cs_ls(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     // 向客户端发送信息
     ret = msg_cs_ls_send(connect_stat->fd, &sendbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_cs_ls_send");
+
+    return 0;
 }
 
 #define FILENAMEMAXSIZE 64

@@ -61,7 +61,7 @@ int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *progra
 
     // 接收来自客户端的消息
     ret = msg_login_recv(connect_stat->fd, &recvbuf);
-    RET_CHECK_BLACKLIST(-1, ret, "msg_regist_recv");
+    RET_CHECK_BLACKLIST(-1, ret, "msg_login_recv");
 
     // 查询数据库: 该用户名是否存在
     char query_str[1024] = {0};

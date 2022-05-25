@@ -65,8 +65,8 @@ static int msg_cs_pwd_mysql_query(MYSQL *mysql_connect, int userid, int pwd_id, 
     char query_str[1024] = {0};
     sprintf(query_str, "SELECT `preid`, `filename` FROM `user_file` WHERE `id` = %d AND `userid` = %d;", pwd_id, userid);
     ret = libmysql_query_1row(mysql_connect, query_str, res_p, 2);
-    if (1 != ret) {
-        RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1col");
+    if (0 == ret) {
+        RET_CHECK_BLACKLIST(0, 0, "libmysql_query_1row");
     } else {
         preid = atoi(preid_str);
     }
@@ -76,14 +76,14 @@ static int msg_cs_pwd_mysql_query(MYSQL *mysql_connect, int userid, int pwd_id, 
 
 static int msg_cs_pwd_getpwd(char *pwd, MYSQL *mysql_connect, int userid, int pwd_id) {
     if (0 == pwd_id) {
-        strcpy(pwd, "~/");
+        strcat(pwd, "~/");
     } else {
         char pwdbuf[64] = {0};
         int pre_pwd_id = msg_cs_pwd_mysql_query(mysql_connect, userid, pwd_id, pwdbuf);
         RET_CHECK_BLACKLIST(-1, pre_pwd_id, "msg_cs_pwd_mysql_query");
         msg_cs_pwd_getpwd(pwd, mysql_connect, userid, pre_pwd_id);
-        strcpy(pwd, pwdbuf);
-        strcpy(pwd, "/");
+        strcat(pwd, pwdbuf);
+        strcat(pwd, "/");
     }
     return 0;
 }
