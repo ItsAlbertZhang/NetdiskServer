@@ -35,7 +35,3 @@ Netdisk server project practice.
 ## 开发手册
 
 详见 Manual.md .
-
-## 提交历史
-
-详见 Commit.md .
