@@ -58,39 +58,8 @@ int msg_cs_cd(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     ret = msg_cs_cd_recv(connect_stat->fd, &recvbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_cs_cd_recv");
 
-    char *dir_p = recvbuf.dir;
-
-    // 如果路径的最后不是以'/'结尾, 则在最后补上'/'
-    if ('/' != dir_p[strlen(dir_p) - 1]) {
-        dir_p[strlen(dir_p) + 1] = 0;
-        dir_p[strlen(dir_p)] = '/';
-    }
-    // 如果路径是以根目录开始
-    if ('/' == *dir_p) {
-        connect_stat->pwd_id = 0;
-        dir_p++;
-    }
-    char *dir_p2 = dir_p;
-    while (*dir_p) {
-        while ('/' != *dir_p2) {
-            dir_p2++;
-        }
-        *dir_p2 = 0; // 将 dir_p2 置 0, msg_cs_cd_mysql_query_id 会认为字符串至此结束
-
-        if (strcmp(dir_p, "..")) {
-            ret = msg_cs_cd_mysql_query_id(program_stat->mysql_connect, connect_stat->userid, connect_stat->pwd_id, dir_p);
-        } else {
-            ret = msg_cs_cd_mysql_query_preid(program_stat->mysql_connect, connect_stat->userid, connect_stat->pwd_id, dir_p);
-        }
-
-        if (-1 == ret) {
-            break;
-        }
-        connect_stat->pwd_id = ret;
-        dir_p = ++dir_p2;
-    }
-
-    if (!*dir_p) {
+    ret = msg_cs_path2id(recvbuf.dir, &connect_stat->pwd_id, program_stat->mysql_connect, connect_stat->userid);
+    if (0 == ret) {
         sendbuf.approve = APPROVE;
     }
 
@@ -102,6 +71,53 @@ int msg_cs_cd(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     msg_cs_ls(connect_stat, program_stat);
 
     return 0;
+}
+
+int msg_cs_path2id(const char *path_s, int *pwd_id, MYSQL *mysql_connect, int userid) {
+    int ret = 0;
+    char path[1024] = {0};
+    strcpy(path, path_s);
+    int id = *pwd_id;
+
+    char *dir_p = path;
+    // 如果路径的最后不是以'/'结尾, 则在最后补上'/'
+    if ('/' != dir_p[strlen(dir_p) - 1]) {
+        dir_p[strlen(dir_p) + 1] = 0;
+        dir_p[strlen(dir_p)] = '/';
+    }
+    // 如果路径是以根目录开始
+    if ('/' == *dir_p) {
+        id = 0;
+        dir_p++;
+    }
+    char *dir_p2 = dir_p;
+    while (*dir_p) {
+        while ('/' != *dir_p2) {
+            dir_p2++;
+        }
+        *dir_p2 = 0; // 将 dir_p2 置 0, msg_cs_cd_mysql_query_id 会认为字符串至此结束
+
+        if (strcmp(dir_p, "..")) {
+            ret = msg_cs_cd_mysql_query_id(mysql_connect, userid, id, dir_p);
+        } else {
+            ret = msg_cs_cd_mysql_query_preid(mysql_connect, userid, id, dir_p);
+        }
+
+        if (-1 == ret) {
+            break;
+        }
+        id = ret;
+        dir_p = ++dir_p2;
+    }
+
+    *pwd_id = id;
+
+    if (!*dir_p) {
+        ret = 0;
+    } else {
+        ret = -1;
+    }
+    return ret;
 }
 
 static int msg_cs_cd_mysql_query_id(MYSQL *mysql_connect, int userid, int pwd_id, char *dirname) {

@@ -45,5 +45,6 @@ int msg_cs_ls(struct connect_stat_t *connect_stat, struct program_stat_t *progra
 
 // cd 命令请求
 int msg_cs_cd(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
+int msg_cs_path2id(const char *path_s, int *pwd_id, MYSQL *mysql_connect, int userid);
 
 #endif /* __CONNECT_MSG_H__ */
