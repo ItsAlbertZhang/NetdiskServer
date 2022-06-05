@@ -76,7 +76,7 @@ int libmysql_query_count(MYSQL *mysql_connect, const char *query_str);
 // 查询 MySQL 数据库: 在指定表的指定字段查询某个值, 并将这个值所在的行内第 i 个字段的值填入 (char *)row_p[i]
 int libmysql_query_1row(MYSQL *mysql_connect, const char *query_str, char *row_p[], int row_cols);
 
-// 查询 MySQL 数据库: 在指定表的指定字段 where_fieldname 查询某个值, 将第 i 个结果所在行的某个字段 res_fieldname 的值填入 (char *)col_p[i]
+// 查询 MySQL 数据库: 在指定表的指定字段 where_fieldname 查询某个值, 将第 i 个结果所在行的某个字段 res_fieldname 的值填入 (char *)col_p[i]. 返回填入数据的个数.
 int libmysql_query_1col(MYSQL *mysql_connect, const char *query_str, char *col_p[], int col_rows);
 
 #endif /* __MYLIBRARY_H__ */

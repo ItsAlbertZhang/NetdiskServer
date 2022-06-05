@@ -7,7 +7,7 @@
 struct msg_cs_cd_recvbuf_t {
     char msgtype;   // 消息类型
     int dir_len;    // 下一字段的长度
-    char dir[1024]; // 当前目录下的文件
+    char dir[1024]; // 目录名
 };
 
 struct msg_cs_cd_sendbuf_t {
@@ -88,13 +88,14 @@ int msg_cs_path2id(const char *path_s, int *pwd_id, MYSQL *mysql_connect, int us
     // 如果路径是以根目录开始
     if ('/' == *dir_p) {
         id = 0;
+        // 将当前目录置为根目录(0)
         dir_p++;
     }
     char *dir_p2 = dir_p;
     while (*dir_p) {
         while ('/' != *dir_p2) {
             dir_p2++;
-        }
+        } // 将 dir_p2 移动至 '/' 所在位置
         *dir_p2 = 0; // 将 dir_p2 置 0, msg_cs_cd_mysql_query_id 会认为字符串至此结束
 
         if (strcmp(dir_p, "..")) {
@@ -113,8 +114,10 @@ int msg_cs_path2id(const char *path_s, int *pwd_id, MYSQL *mysql_connect, int us
     *pwd_id = id;
 
     if (!*dir_p) {
+        // 如果 dir_p 已经移动到了最后
         ret = 0;
     } else {
+        // 否则, 说明在中间有错误的路径, 无法继续深入
         ret = -1;
     }
     return ret;

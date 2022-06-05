@@ -15,6 +15,7 @@ enum msg_type {
     MT_CS_PWD,   // 短命令(command short): pwd
     MT_CS_LS,    // 短命令(command short): ls
     MT_CS_CD,    // 短命令(command short): cd
+    MT_CS_RM,    // 短命令(command short): rm
     MT_COMM_S,   // 短命令请求
     MT_COMM_L,   // 长命令请求
 };
@@ -46,5 +47,9 @@ int msg_cs_ls(struct connect_stat_t *connect_stat, struct program_stat_t *progra
 // cd 命令请求
 int msg_cs_cd(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
 int msg_cs_path2id(const char *path_s, int *pwd_id, MYSQL *mysql_connect, int userid);
+
+// rm 命令请求
+int msg_cs_rm(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
+
 
 #endif /* __CONNECT_MSG_H__ */
