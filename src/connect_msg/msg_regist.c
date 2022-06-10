@@ -67,7 +67,6 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
     int dupnum = libmysql_query_count(program_stat->mysql_connect, query_str);
     if (0 == dupnum) { // 用户名未被注册
         sendbuf.approve = APPROVE;
-        // 如果是正式注册请求, 则应对密码段进行处理
         if (recvbuf.pwd_ciprsa_len) {
             // 对接收到的密文进行 rsa 解密处理
             char pwd_plaintext[32] = {0};
