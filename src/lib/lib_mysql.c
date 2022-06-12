@@ -1,7 +1,7 @@
 #include "head.h"
 #include "mylibrary.h"
 
-int libmysql_query_count(MYSQL *mysql_connect, const char *query_str) {
+int libmysql_query_11count(MYSQL *mysql_connect, const char *query_str) {
     int ret = -1;
     MYSQL_RES *result = NULL;
 

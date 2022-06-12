@@ -66,7 +66,7 @@ static int msg_cs_ls_mysql_query(MYSQL *mysql_connect, int userid, int pwd_id, c
     // 获取当前目录下的文件数量
     char query_str[1024] = {0};
     sprintf(query_str, "SELECT COUNT(*) FROM `user_file` WHERE `preid` = %d AND `userid` = %d;", pwd_id, userid);
-    int filenum = libmysql_query_count(mysql_connect, query_str);
+    int filenum = libmysql_query_11count(mysql_connect, query_str);
     // 申请空间
     char **filename = (char **)malloc(sizeof(char *) * filenum);
     filename[0] = (char *)malloc(FILENAMEMAXSIZE * filenum);
@@ -86,8 +86,8 @@ static int msg_cs_ls_mysql_query(MYSQL *mysql_connect, int userid, int pwd_id, c
     ret = libmysql_query_1col(mysql_connect, query_str, filetype, filenum);
     RET_CHECK_BLACKLIST(ret, -1, "libmysql_query_1col");
     // 拼接结果
-    for(int i = 0; i < filenum; i++) {
-        if(!strcmp(filetype[i], "d")) {
+    for (int i = 0; i < filenum; i++) {
+        if (!strcmp(filetype[i], "d")) {
             strcat(res, "\e[34m\e[1m");
         }
         strcat(res, filename[i]);

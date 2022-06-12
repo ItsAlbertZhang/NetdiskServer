@@ -8,7 +8,7 @@
 
 - pwd
 - ls, cd
-- mv, rm
+- rm, mv, cp
 - mkdir, rmdir
 - gets, puts
 

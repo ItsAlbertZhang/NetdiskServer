@@ -64,7 +64,7 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
     // 查询数据库: 该用户名是否已存在
     char query_str[1024] = {0};
     sprintf(query_str, "SELECT COUNT(*) FROM `user_auth` WHERE `username` = '%s';", recvbuf.username);
-    int dupnum = libmysql_query_count(program_stat->mysql_connect, query_str);
+    int dupnum = libmysql_query_11count(program_stat->mysql_connect, query_str);
     if (0 == dupnum) { // 用户名未被注册
         sendbuf.approve = APPROVE;
         if (recvbuf.pwd_ciprsa_len) {

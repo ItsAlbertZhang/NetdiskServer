@@ -71,7 +71,7 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
         logging(LOG_DEBUG, logbuf);
         ret = msg_cs_cd(connect_stat, program_stat);
         if (-1 == ret) {
-            logging(LOG_ERROR, "msg_cs_ls 执行出错.");
+            logging(LOG_ERROR, "msg_cs_cd 执行出错.");
         }
         break;
     case MT_CS_RM:
@@ -79,7 +79,39 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
         logging(LOG_DEBUG, logbuf);
         ret = msg_cs_rm(connect_stat, program_stat);
         if (-1 == ret) {
-            logging(LOG_ERROR, "msg_cs_ls 执行出错.");
+            logging(LOG_ERROR, "msg_cs_rm 执行出错.");
+        }
+        break;
+    case MT_CS_MV:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_CS_MV 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        ret = msg_cs_mv(connect_stat, program_stat);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_cs_mv 执行出错.");
+        }
+        break;
+    case MT_CS_CP:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_CS_CP 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        ret = msg_cs_cp(connect_stat, program_stat);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_cs_cp 执行出错.");
+        }
+        break;
+    case MT_CS_MKDIR:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_CS_MKDIR 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        ret = msg_cs_mkdir(connect_stat, program_stat);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_cs_mkdir 执行出错.");
+        }
+        break;
+    case MT_CS_RMDIR:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_CS_RMDIR 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        ret = msg_cs_rmdir(connect_stat, program_stat);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_cs_rmdir 执行出错.");
         }
         break;
     default:

@@ -63,22 +63,18 @@ int msg_cs_rm(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     RET_CHECK_BLACKLIST(-1, ret, "msg_cs_rm_recv");
 
     int rmid = connect_stat->pwd_id;
-    ret = msg_cs_path2id(recvbuf.dir, &rmid, program_stat->mysql_connect, connect_stat->userid);
-    if (0 == ret && recvbuf.rmtype == RM_NULL) {
+    ret = msg_lib_path2id(recvbuf.dir, &rmid, program_stat->mysql_connect);
+    if (-1 != ret && recvbuf.rmtype == RM_NULL) {
         // 普通的 rm 删除, 则 rmid 必须为文件(而非目录)
         char query_str[1024] = {0};
-        char type_str[16] = {0};
-        char *res_p[] = {&type_str[0]};
-        sprintf(query_str, "SELECT `type` FROM `user_file` WHERE `id` = %d AND `userid` = %d;", rmid, connect_stat->userid);
-        ret = libmysql_query_1col(program_stat->mysql_connect, query_str, res_p, 1);
-        if (0 == strcmp(type_str, "f")) {
+        if (TYPE_FILE == ret) {
             sprintf(query_str, "DELETE FROM `user_file` WHERE `id` = %d AND `userid` = %d;", rmid, connect_stat->userid);
             ret = mysql_query(program_stat->mysql_connect, query_str);
             RET_CHECK_BLACKLIST(-1, ret, "mysql_query");
             sendbuf.approve = APPROVE;
         }
     }
-    if (0 == ret && recvbuf.rmtype == RM_R) {
+    if (-1 != ret && recvbuf.rmtype == RM_R) {
         // 递归的 rm 删除. rmid 可以为文件, 也可以为目录.
         ret = msg_cs_rm_r(program_stat->mysql_connect, rmid, connect_stat->userid);
         RET_CHECK_BLACKLIST(-1, ret, "msg_cs_rm_r");
@@ -96,7 +92,7 @@ static int msg_cs_rm_r(MYSQL *mysql_connect, int rmid, int userid) {
     int ret = 0;
 
     char query_str[1024] = {0};
-    char type_str[16] = {0};
+    char type_str[4] = {0};
     char *res_p[] = {&type_str[0]};
     sprintf(query_str, "SELECT `type` FROM `user_file` WHERE `id` = %d AND `userid` = %d;", rmid, userid);
     ret = libmysql_query_1col(mysql_connect, query_str, res_p, 1);
@@ -110,7 +106,7 @@ static int msg_cs_rm_r(MYSQL *mysql_connect, int rmid, int userid) {
         // 获取当前目录下的文件数量
         char query_str[1024] = {0};
         sprintf(query_str, "SELECT COUNT(*) FROM `user_file` WHERE `preid` = %d AND `userid` = %d;", rmid, userid);
-        int filenum = libmysql_query_count(mysql_connect, query_str);
+        int filenum = libmysql_query_11count(mysql_connect, query_str);
         if (filenum) {
             // 申请空间
             char **fileid = (char **)malloc(sizeof(char *) * filenum);
@@ -127,14 +123,13 @@ static int msg_cs_rm_r(MYSQL *mysql_connect, int rmid, int userid) {
                 ret = msg_cs_rm_r(mysql_connect, atoi(fileid[i]), userid);
                 RET_CHECK_BLACKLIST(-1, ret, "msg_cs_rm_r");
             }
-            // 再次获取当前目录下的文件数量
-            sprintf(query_str, "SELECT COUNT(*) FROM `user_file` WHERE `preid` = %d AND `userid` = %d;", rmid, userid);
-            filenum = libmysql_query_count(mysql_connect, query_str);
             // 释放空间
             free(fileid[0]);
             free(fileid);
         }
-
+        // 再次获取当前目录下的文件数量
+        sprintf(query_str, "SELECT COUNT(*) FROM `user_file` WHERE `preid` = %d AND `userid` = %d;", rmid, userid);
+        filenum = libmysql_query_11count(mysql_connect, query_str);
         if (0 == filenum) {
             // 删除当前目录
             sprintf(query_str, "DELETE FROM `user_file` WHERE `id` = %d AND `userid` = %d;", rmid, userid);
