@@ -92,10 +92,10 @@ int msg_cs_cp(struct connect_stat_t *connect_stat, struct program_stat_t *progra
         check_flag = 0 == id_temp;
     }
     // 验证文件名是否重复
-    if(check_flag) {
+    char filename[64] = {0};
+    if (check_flag) {
         // 获取源文件文件名
-        char filename[64] = {0};
-        if(recvbuf.rename_len) {
+        if (recvbuf.rename_len) {
             strcpy(filename, recvbuf.rename);
         } else {
             char *res_p[] = {&filename[0]};
@@ -110,11 +110,7 @@ int msg_cs_cp(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     }
 
     if (check_flag) {
-        if (recvbuf.rename_len) {
-            ret = msg_cs_cp_r(program_stat->mysql_connect, id_source, id_dir, recvbuf.rename);
-        } else {
-            ret = msg_cs_cp_r(program_stat->mysql_connect, id_source, id_dir, NULL);
-        }
+        ret = msg_cs_cp_r(program_stat->mysql_connect, id_source, id_dir, filename);
         RET_CHECK_BLACKLIST(-1, ret, "msg_cs_cp_r");
         sendbuf.approve = APPROVE;
     }
