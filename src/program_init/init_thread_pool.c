@@ -18,6 +18,9 @@ int init_pthread_pool(struct thread_stat_t *thread_stat, const char *config_dir,
     queue_init(&thread_stat->thread_resource.queue, atoi(config[1])); // 初始化任务队列
     pthread_mutex_init(&thread_stat->thread_resource.mutex, NULL);    // 初始化线程锁
     pthread_cond_init(&thread_stat->thread_resource.cond, NULL);      // 初始化条件变量
+    // 初始化文件池所在目录
+    strncpy(thread_stat->thread_resource.filepool_dir, config_dir, strlen(config_dir) - strlen("config/"));
+    strcat(thread_stat->thread_resource.filepool_dir, "file/");
 
     // 拉起子线程
     for (int i = 0; i < thread_stat->pth_num; i++) {
