@@ -67,7 +67,6 @@ int msg_cs_cd(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     ret = msg_cs_cd_send(connect_stat->fd, &sendbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_cs_cd_send");
 
-    msg_cs_pwd(connect_stat, program_stat);
     msg_cs_ls(connect_stat, program_stat);
 
     return 0;

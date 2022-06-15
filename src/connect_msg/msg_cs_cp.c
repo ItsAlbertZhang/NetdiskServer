@@ -91,11 +91,22 @@ int msg_cs_cp(struct connect_stat_t *connect_stat, struct program_stat_t *progra
         }
         check_flag = 0 == id_temp;
     }
-    // 当目标路径中包括源文件时, 必须进行重新命名
-    if (check_flag) {
-        sprintf(query_str, "SELECT `preid` FROM `user_file` WHERE `id` = %d;", id_source);
-        int id_temp = libmysql_query_11count(program_stat->mysql_connect, query_str);
-        check_flag = id_temp != id_dir || recvbuf.rename_len;
+    // 验证文件名是否重复
+    if(check_flag) {
+        // 获取源文件文件名
+        char filename[64] = {0};
+        if(recvbuf.rename_len) {
+            strcpy(filename, recvbuf.rename);
+        } else {
+            char *res_p[] = {&filename[0]};
+            sprintf(query_str, "SELECT `filename` FROM `user_file` WHERE `id` = %d;", id_source);
+            ret = libmysql_query_1col(program_stat->mysql_connect, query_str, res_p, 1);
+            RET_CHECK_BLACKLIST(-1, ret, "libmysql_query_1col");
+        }
+        // 验证目标目录下是否存在该文件名
+        sprintf(query_str, "SELECT COUNT(*) FROM `user_file` WHERE `preid` = %d AND `filename` = '%s';", id_dir, filename);
+        ret = libmysql_query_11count(program_stat->mysql_connect, query_str);
+        check_flag = 0 == ret;
     }
 
     if (check_flag) {

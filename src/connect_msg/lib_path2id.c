@@ -40,7 +40,7 @@ int msg_lib_path2id(const char *path, int *id, MYSQL *mysql_connect) {
             if ('/' == *p) {
                 ret = msg_lib_path2id(p + 1, id, mysql_connect);
             }
-        } else if (1 != libmysql_query_11count(mysql_connect, query_str)) {
+        } else if (0 == libmysql_query_11count(mysql_connect, query_str)) {
             // 文件名有误
             ret = -1;
         } else {

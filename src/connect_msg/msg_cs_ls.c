@@ -93,6 +93,7 @@ static int msg_cs_ls_mysql_query(MYSQL *mysql_connect, int userid, int pwd_id, c
         strcat(res, filename[i]);
         strcat(res, "\e[0m\n");
     }
+    res[strlen(res) - 1] = 0;
     // 释放空间
     free(filename[0]);
     free(filename);

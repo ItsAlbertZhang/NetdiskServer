@@ -66,6 +66,7 @@ int msg_cs_mv(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     ret = msg_cs_mv_recv(connect_stat->fd, &recvbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_cs_mv_recv");
 
+    char query_str[1024] = {0};
     int id_source = connect_stat->pwd_id, id_dir = connect_stat->pwd_id;
     int check_flag = 1;
     // 验证原文件或目录的合法性
@@ -78,9 +79,25 @@ int msg_cs_mv(struct connect_stat_t *connect_stat, struct program_stat_t *progra
         ret = msg_lib_path2id(recvbuf.mvdir, &id_dir, program_stat->mysql_connect);
         check_flag = TYPE_DIR == ret;
     }
+    // 验证文件名是否重复
+    if(check_flag) {
+        // 获取源文件文件名
+        char filename[64] = {0};
+        if(recvbuf.rename_len) {
+            strcpy(filename, recvbuf.rename);
+        } else {
+            char *res_p[] = {&filename[0]};
+            sprintf(query_str, "SELECT `filename` FROM `user_file` WHERE `id` = %d;", id_source);
+            ret = libmysql_query_1col(program_stat->mysql_connect, query_str, res_p, 1);
+            RET_CHECK_BLACKLIST(-1, ret, "libmysql_query_1col");
+        }
+        // 验证目标目录下是否存在该文件名
+        sprintf(query_str, "SELECT COUNT(*) FROM `user_file` WHERE `preid` = %d AND `filename` = '%s';", id_dir, filename);
+        ret = libmysql_query_11count(program_stat->mysql_connect, query_str);
+        check_flag = 0 == ret;
+    }
 
     if (check_flag) {
-        char query_str[1024] = {0};
         if (recvbuf.rename_len) {
             sprintf(query_str, "UPDATE `user_file` SET `preid` = %d, `filename` = '%s' WHERE `id` = %d;", id_dir, recvbuf.rename, id_source);
         } else {
