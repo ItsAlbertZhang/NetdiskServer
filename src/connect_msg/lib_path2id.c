@@ -29,7 +29,6 @@ int msg_lib_path2id(const char *path, int *id, MYSQL *mysql_connect) {
         strncpy(filename, path, p - path); // 获得当前递归需要处理的文件名
         // 查询该文件或目录是否存在
         sprintf(query_str, "SELECT COUNT(*) FROM `user_file` WHERE `preid` = %d AND `filename` = '%s';", *id, filename);
-        printf("%s\n", query_str);
         if (0 == strcmp("..", filename)) {
             sprintf(query_str, "SELECT `preid` FROM `user_file` WHERE `id` = %d;", *id);
             printf("%s\n", query_str);
@@ -53,24 +52,23 @@ int msg_lib_path2id(const char *path, int *id, MYSQL *mysql_connect) {
             RET_CHECK_BLACKLIST(-1, ret, "libmysql_query_1row");
             *id = atoi(id_str); // 将获取到的 id 填入传入传出参数
 
-            if ('f' == *type_str && '\0' == *p) {
+            if ('\0' == *p && 'f' == *type_str) {
                 // 获取了一个文件的 id, 且无更深一级的递归. 返回 TYPE_FILE.
                 ret = TYPE_FILE;
             }
-            if ('f' == *type_str && '/' == *p) {
-                // 获取了一个文件的 id, 且试图向更深一级递归. 发生错误.
-                ret = -1;
-            }
-            if ('d' == *type_str && '\0' == *p) {
+            if ('\0' == *p && 'd' == *type_str) {
                 // 获取了一个目录的 id, 且无更深一级的递归. 返回 TYPE_DIR.
                 ret = TYPE_DIR;
             }
-            if ('d' == *type_str && '/' == *p) {
+            if ('/' == *p && 'f' == *type_str) {
+                // 获取了一个文件的 id, 且试图向更深一级递归. 发生错误.
+                ret = -1;
+            }
+            if ('/' == *p && 'd' == *type_str ) {
                 // 获取了一个目录的 id, 且试图向更深一级递归. 递归即可.
                 ret = msg_lib_path2id(p + 1, id, mysql_connect);
             }
         }
     }
-    printf("path2id ret = %d\n", ret);
     return ret;
 }
