@@ -80,10 +80,10 @@ int msg_cs_mv(struct connect_stat_t *connect_stat, struct program_stat_t *progra
         check_flag = TYPE_DIR == ret;
     }
     // 验证文件名是否重复
-    if(check_flag) {
+    char filename[64] = {0};
+    if (check_flag) {
         // 获取源文件文件名
-        char filename[64] = {0};
-        if(recvbuf.rename_len) {
+        if (recvbuf.rename_len) {
             strcpy(filename, recvbuf.rename);
         } else {
             char *res_p[] = {&filename[0]};
@@ -98,11 +98,7 @@ int msg_cs_mv(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     }
 
     if (check_flag) {
-        if (recvbuf.rename_len) {
-            sprintf(query_str, "UPDATE `user_file` SET `preid` = %d, `filename` = '%s' WHERE `id` = %d;", id_dir, recvbuf.rename, id_source);
-        } else {
-            sprintf(query_str, "UPDATE `user_file` SET `preid` = %d WHERE `id` = %d;", id_dir, id_source);
-        }
+        sprintf(query_str, "UPDATE `user_file` SET `preid` = %d, `filename` = '%s' WHERE `id` = %d;", id_dir, filename, id_source);
         ret = mysql_query(program_stat->mysql_connect, query_str);
         RET_CHECK_BLACKLIST(-1, ret, "mysql_query");
         sendbuf.approve = APPROVE;
