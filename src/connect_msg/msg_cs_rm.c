@@ -64,7 +64,7 @@ int msg_cs_rm(struct connect_stat_t *connect_stat, struct program_stat_t *progra
 
     int rmid = connect_stat->pwd_id;
     ret = msg_lib_path2id(recvbuf.dir, &rmid, program_stat->mysql_connect);
-    if (-1 != ret && recvbuf.rmtype == RM_NULL) {
+    if (TYPE_FILE == ret && recvbuf.rmtype == RM_NULL) {
         // 普通的 rm 删除, 则 rmid 必须为文件(而非目录)
         char query_str[1024] = {0};
         if (TYPE_FILE == ret) {

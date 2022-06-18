@@ -58,8 +58,10 @@ int msg_cs_cd(struct connect_stat_t *connect_stat, struct program_stat_t *progra
     ret = msg_cs_cd_recv(connect_stat->fd, &recvbuf);
     RET_CHECK_BLACKLIST(-1, ret, "msg_cs_cd_recv");
 
-    ret = msg_lib_path2id(recvbuf.dir, &connect_stat->pwd_id, program_stat->mysql_connect);
-    if (-1 != ret) {
+    int id_temp = connect_stat->pwd_id;
+    ret = msg_lib_path2id(recvbuf.dir, &id_temp, program_stat->mysql_connect);
+    if (TYPE_DIR == ret) {
+        connect_stat->pwd_id = id_temp;
         sendbuf.approve = APPROVE;
     }
 

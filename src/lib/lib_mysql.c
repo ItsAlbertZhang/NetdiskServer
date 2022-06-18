@@ -9,7 +9,9 @@ int libmysql_query_11count(MYSQL *mysql_connect, const char *query_str) {
         result = mysql_use_result(mysql_connect);
         if (result) {
             MYSQL_ROW row = mysql_fetch_row(result);
-            ret = atoi(row[0]);
+            if (row) {
+                ret = atoi(row[0]);
+            }
         }
     }
 
@@ -25,7 +27,7 @@ int libmysql_query_1row(MYSQL *mysql_connect, const char *query_str, char *row_p
         result = mysql_use_result(mysql_connect);
         if (result) {
             MYSQL_ROW row = mysql_fetch_row(result);
-            if (NULL != row) {
+            if (row) {
                 for (i = 0; i < row_cols && i < mysql_num_fields(result); i++) {
                     strcpy(row_p[i], row[i]);
                 }
@@ -45,7 +47,7 @@ int libmysql_query_1col(MYSQL *mysql_connect, const char *query_str, char *col_p
     if (!mysql_query(mysql_connect, query_str)) {
         result = mysql_use_result(mysql_connect);
         if (result) {
-            while ((row = mysql_fetch_row(result)) != NULL) {
+            while (NULL != (row = mysql_fetch_row(result))) {
                 // 按行循环提取查询结果. 如果查询结果为空则不会进入循环.
                 strcpy(col_p[i++], row[0]);
             }

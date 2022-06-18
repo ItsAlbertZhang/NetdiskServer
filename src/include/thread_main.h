@@ -4,7 +4,7 @@
 #include "head.h"
 #include "main.h"
 
-#define AUTO_DISCONNECT_SECOND 16 // 16 秒未操作自动断开
+#define AUTO_DISCONNECT_SECOND 1000 // 16 秒未操作自动断开
 
 // 现有连接状态
 struct connect_stat_t {

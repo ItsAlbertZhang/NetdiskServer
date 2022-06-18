@@ -156,7 +156,6 @@ static int msg_cs_cp_r(MYSQL *mysql_connect, int id_source, int id_dir, const ch
             } else {
                 sprintf(query_str, "SELECT `id` FROM `user_file` WHERE `preid` = %d AND `filename` = '%s';", id_dir, filename);
             }
-            printf("%s\n", query_str);
             id_dir_new = libmysql_query_11count(mysql_connect, query_str);
             // 申请空间
             char **fileid = (char **)malloc(sizeof(char *) * filenum);

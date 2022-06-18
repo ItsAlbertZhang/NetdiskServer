@@ -14,10 +14,15 @@ int write_file_from_string(const char *str, int len, const char *dir, const char
 
 // queue.c
 
+#define QUEUE_FLAG_S2C 0
+#define QUEUE_FLAG_C2S 1
+
 // 队列结构体
 struct queue_elem_t {
-    int connect_fd;
-    char file_md5[1024];
+    char flag;           // 工作模式 (s2c or c2s)
+    int connect_fd;      // 连接对端的 socket 文件描述符
+    size_t filesize;     // 文件大小
+    char file_md5[1024]; // 文件的 MD5 码
 };
 
 struct queue_t {
@@ -34,10 +39,10 @@ int queue_init(struct queue_t **pQ, int len);
 // 销毁队列
 int queue_destroy(struct queue_t **pQ);
 
-// 入队
+// 入队. 队满返回 -1, 否则返回 0.
 int queue_in(struct queue_t *Q, struct queue_elem_t elem);
 
-// 出队
+// 出队. 队空返回 -1, 否则返回 0.
 int queue_out(struct queue_t *Q, struct queue_elem_t *elem);
 
 // rsa.c

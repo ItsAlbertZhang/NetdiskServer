@@ -20,6 +20,7 @@ enum msg_type {
     MT_CS_CP,    // 短命令(command short): cp
     MT_CS_MKDIR, // 短命令(command short): mkdir
     MT_CS_RMDIR, // 短命令(command short): rmdir
+    MT_CL_S2C,   // 长命令(command long): server to client (download)
     MT_COMM_S,   // 短命令请求
     MT_COMM_L,   // 长命令请求
 };
@@ -72,5 +73,8 @@ int msg_cs_mkdir(struct connect_stat_t *connect_stat, struct program_stat_t *pro
 
 // rmdir 命令请求
 int msg_cs_rmdir(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
+
+// download 命令请求
+int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
 
 #endif /* __CONNECT_MSG_H__ */

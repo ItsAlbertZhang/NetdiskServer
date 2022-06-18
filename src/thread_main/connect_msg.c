@@ -114,6 +114,14 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
             logging(LOG_ERROR, "msg_cs_rmdir 执行出错.");
         }
         break;
+    case MT_CL_S2C:
+        sprintf(logbuf, "接收到 fd 为 %d 的 MT_CL_S2C 消息.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
+        ret = msg_cl_s2c(connect_stat, program_stat);
+        if (-1 == ret) {
+            logging(LOG_ERROR, "msg_cl_s2c 执行出错.");
+        }
+        break;
     default:
         sprintf(logbuf, "接收到 fd 为 %d 的未知消息.", connect_stat->fd);
         logging(LOG_DEBUG, logbuf);
@@ -130,8 +138,7 @@ size_t recv_n(int connect_fd, void *buf, size_t len, int flags) {
     size_t recved_len = 0;
     while (recved_len < len) {
         ret = recv(connect_fd, p + recved_len, len - recved_len, flags);
-        RET_CHECK_BLACKLIST(-1, ret, "recv");
-        if (0 == ret) {
+        if (0 >= ret) {
             return 0; // 当对端断开时, 返回 0.
         }
         recved_len += ret;

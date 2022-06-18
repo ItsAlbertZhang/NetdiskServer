@@ -31,7 +31,6 @@ int msg_lib_path2id(const char *path, int *id, MYSQL *mysql_connect) {
         sprintf(query_str, "SELECT COUNT(*) FROM `user_file` WHERE `preid` = %d AND `filename` = '%s';", *id, filename);
         if (0 == strcmp("..", filename)) {
             sprintf(query_str, "SELECT `preid` FROM `user_file` WHERE `id` = %d;", *id);
-            printf("%s\n", query_str);
             *id = libmysql_query_11count(mysql_connect, query_str);
             if ('\0' == *p) {
                 ret = TYPE_DIR;
