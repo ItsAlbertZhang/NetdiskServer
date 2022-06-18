@@ -113,8 +113,7 @@ int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *prog
 static int connect_cpy(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, int pretoken, char *token_plain) {
     int ret = -1;
     // 获取旧连接指针
-    int max_connect_num = program_stat->thread_stat.pth_num + program_stat->thread_stat.thread_resource.queue->len;
-    int token_connect_diff = (pretoken % max_connect_num) - (connect_stat->fd % max_connect_num);
+    int token_connect_diff = (pretoken % program_stat->thread_stat.max_connect_num) - (connect_stat->fd % program_stat->thread_stat.max_connect_num);
     struct connect_stat_t *token_stat = connect_stat + token_connect_diff;
     // 判断两者是否为同一个客户端以及 ip
     if (!strcmp(token_plain, token_stat->token) && !memcmp(&connect_stat->addr.sin_addr, &token_stat->addr.sin_addr, sizeof(struct in_addr))) {

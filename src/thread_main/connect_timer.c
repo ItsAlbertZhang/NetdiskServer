@@ -16,6 +16,8 @@ int connect_timer_in(struct connect_stat_t *connect_stat, struct connect_timer_h
     // 将定时器信息存入连接状态
     connect_stat->connect_timer_index = i;
     connect_stat->connect_timer_real = -1;
+    sprintf(logbuf, "已将 %d 号连接放入时间轮定时器.", connect_stat->fd);
+    logging(LOG_DEBUG, logbuf);
 
     return 0;
 }
@@ -35,6 +37,8 @@ int connect_timer_out(struct connect_stat_t *connect_stat, struct connect_timer_
     connect_timer_arr[connect_stat->connect_timer_index].data.len -= 1;
     // 删除结点并释放内存
     free(thisnode);
+    sprintf(logbuf, "已将 %d 号连接从时间轮计时器上取出.", connect_stat->fd);
+    logging(LOG_DEBUG, logbuf);
 
     return 0;
 }

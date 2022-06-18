@@ -117,7 +117,7 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
     case MT_CL_S2C:
         sprintf(logbuf, "接收到 fd 为 %d 的 MT_CL_S2C 消息.", connect_stat->fd);
         logging(LOG_DEBUG, logbuf);
-        ret = msg_cl_s2c(connect_stat, program_stat);
+        ret = msg_cl_s2c(connect_stat, program_stat, connect_timer_arr);
         if (-1 == ret) {
             logging(LOG_ERROR, "msg_cl_s2c 执行出错.");
         }

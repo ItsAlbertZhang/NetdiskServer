@@ -45,7 +45,7 @@ static int msg_cl_s2c_send(int connect_fd, struct msg_cl_s2c_sendbuf_t *sendbuf)
     return 0;
 }
 
-int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat) {
+int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, struct connect_timer_hashnode *connect_timer_arr) {
     int ret = 0;
 
     // 准备资源
@@ -91,6 +91,9 @@ int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *progr
             // 向客户端发送消息
             ret = msg_cl_s2c_send(connect_stat->fd, &sendbuf);
             RET_CHECK_BLACKLIST(-1, ret, "msg_cl_s2c_send");
+            // 将连接从时间轮定时器上取出
+            ret = connect_timer_out(connect_stat, connect_timer_arr);
+            RET_CHECK_BLACKLIST(-1, ret, "connect_timer_out");
             // 向子线程发送委派请求
             pthread_cond_signal(&program_stat->thread_stat.thread_resource.cond);
             logging(LOG_DEBUG, "已向子线程发出委派请求.");

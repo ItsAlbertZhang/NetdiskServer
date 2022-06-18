@@ -26,10 +26,6 @@ void *thread_child_handle(void *args) {
 
             // 情况 QUEUE_FLAG_S2C: 执行 s2c 任务
             if (QUEUE_FLAG_S2C == elem.flag) {
-                // code here
-                // 对 elem 和 thread_resource 的改进, 以及对时间轮定时器的改进
-                // 将连接从时间轮定时器中取出
-                // ret = connect_timer_out(elem.connect_stat, thread_resource->connect_timer_arr);
                 // 打开文件
                 char filedir[1024] = {0};
                 strcat(filedir, thread_resource->filepool_dir);
@@ -45,8 +41,8 @@ void *thread_child_handle(void *args) {
                 logging(LOG_INFO, logbuf);
                 // 关闭文件
                 close(filefd);
-                // 将连接重新加入时间轮定时器
-                // ret = connect_timer_in(elem.connect_stat, thread_resource->connect_timer_arr);
+                // 通知主线程
+                write(thread_resource->pipe_fd[1], &elem.connect_fd, sizeof(elem.connect_fd));
             }
 
             // 情况 QUEUE_FLAG_C2S: 执行 c2s 任务

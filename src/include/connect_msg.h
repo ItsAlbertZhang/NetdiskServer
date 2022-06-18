@@ -75,6 +75,6 @@ int msg_cs_mkdir(struct connect_stat_t *connect_stat, struct program_stat_t *pro
 int msg_cs_rmdir(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
 
 // download 命令请求
-int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
+int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, struct connect_timer_hashnode *connect_timer_arr);
 
 #endif /* __CONNECT_MSG_H__ */

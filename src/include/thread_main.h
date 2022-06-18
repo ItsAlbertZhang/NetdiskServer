@@ -4,7 +4,7 @@
 #include "head.h"
 #include "main.h"
 
-#define AUTO_DISCONNECT_SECOND 1000 // 16 秒未操作自动断开
+#define AUTO_DISCONNECT_SECOND 16 // 16 秒未操作自动断开
 
 // 现有连接状态
 struct connect_stat_t {
@@ -17,13 +17,13 @@ struct connect_stat_t {
     int pwd_id;              // 当前工作目录 id. 初次赋值于 msg_login 或 msg_regist.
 };
 
-// 哈希表结点数据部分
+// 时间轮定时器: 哈希表结点数据内容
 union connect_timer_hashnode_data {
     struct connect_stat_t *conn; // 非头结点, 指向实际数据
     long len;                    // 头结点, 记录拉链长度
 };
 
-// 哈希表结点
+// 时间轮定时器: 哈希表结点
 struct connect_timer_hashnode {
     union connect_timer_hashnode_data data;
     struct connect_timer_hashnode *next;
@@ -37,6 +37,7 @@ struct connect_sleep_t {
     int pwd_id;              // 当前工作目录 id
 };
 
+// 休眠连接链表数据内容
 union connect_sleep_nodedata {
     struct connect_sleep_t conn;
     int len;
