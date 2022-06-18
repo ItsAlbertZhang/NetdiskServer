@@ -80,7 +80,7 @@ int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *progr
         elem.connect_fd = connect_stat->fd;
         strcpy(elem.file_md5, filemd5);
         elem.filesize = atol(filesize);
-        ret = queue_in(program_stat->thread_stat.thread_resource.queue, elem);
+        ret = queue_in(program_stat->thread_stat.thread_resource.queue, &elem);
 
         // 只有当入队成功时, 才执行以下步骤
         if (-1 != ret) {
