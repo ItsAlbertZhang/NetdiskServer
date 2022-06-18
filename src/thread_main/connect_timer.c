@@ -70,7 +70,7 @@ int connect_timer_move(struct connect_stat_t *connect_stat, struct connect_timer
     return 0;
 }
 
-int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr, struct connect_sleep_node *connect_sleep) {
+int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr, struct queue_t *connect_sleep_queue) {
     int ret = 0;
     time_t now = time(NULL) + 1;
     int i = now % AUTO_DISCONNECT_SECOND; // 获取下一秒对应的时间轮片
@@ -83,7 +83,7 @@ int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr, struc
         thisstat = thisnode->data.conn;
         if (-1 == thisnode->data.conn->connect_timer_real) {
             // 该连接在上一个时间轮循环中无活动
-            ret = connect_destory(thisstat, connect_timer_arr, connect_sleep, 1);
+            ret = connect_destory(thisstat, connect_timer_arr, connect_sleep_queue, 1);
             RET_CHECK_BLACKLIST(-1, ret, "connect_destory");
         } else {
             // 该连接在上一个时间轮循环中有活动

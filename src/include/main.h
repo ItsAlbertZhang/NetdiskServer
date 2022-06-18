@@ -51,7 +51,7 @@ struct program_stat_t {
 #define QUEUE_FLAG_C2S 1
 
 // 线程通信队列元素结构体
-struct queue_elem_t {
+struct thread_task_queue_elem_t {
     char flag;           // 工作模式 (s2c or c2s)
     int connect_fd;      // 连接对端的 socket 文件描述符
     size_t filesize;     // 文件大小

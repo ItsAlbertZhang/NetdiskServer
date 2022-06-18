@@ -54,7 +54,7 @@ static int msg_dupconn_send(int connect_fd, struct msg_dupconn_sendbuf_t *sendbu
 // 尝试从现有连接中拷贝连接
 static int connect_cpy(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, int pretoken, char *token_plain);
 
-int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, struct connect_sleep_node *connect_sleep) {
+int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, struct queue_t *connect_sleep_queue) {
     int ret = 0;
 
     // 准备资源
@@ -88,7 +88,7 @@ int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *prog
     }
     if (!cpy_complete) {
         // 尝试从休眠连接中拿出连接信息
-        ret = connect_sleep_awake(connect_sleep, token_plain, connect_stat);
+        ret = connect_sleep_awake(connect_sleep_queue, token_plain, connect_stat);
         if (0 == ret) {
             sprintf(logbuf, "已成功恢复旧 fd 为 %d 的连接, 其 token 为 %s, 用户为 %d, 当前工作目录为 %d.", recvbuf.pretoken, connect_stat->token, connect_stat->userid, connect_stat->pwd_id);
             logging(LOG_INFO, logbuf);

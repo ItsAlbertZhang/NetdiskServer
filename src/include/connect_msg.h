@@ -48,8 +48,7 @@ int msg_regist(struct connect_stat_t *connect_stat, struct program_stat_t *progr
 int msg_login(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
 
 // 拷贝连接请求
-int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, struct connect_sleep_node *connect_sleep);
-
+int msg_dupconn(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, struct queue_t *connect_sleep_queue);
 // pwd 命令请求
 int msg_cs_pwd(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat);
 

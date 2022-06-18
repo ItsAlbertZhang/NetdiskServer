@@ -38,7 +38,7 @@ int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, 
     return 0;
 }
 
-int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct connect_sleep_node *connect_sleep, int gotosleep) {
+int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct queue_t *connect_sleep_queue, int gotosleep) {
     int ret = 0;
 
     ret = connect_timer_out(connect_stat, connect_timer_arr); // 将连接从时间轮定时器中取出
@@ -49,7 +49,7 @@ int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_ha
     RET_CHECK_BLACKLIST(-1, ret, "close");
 
     if (gotosleep) {
-        connect_sleep_fall(connect_sleep, connect_stat);
+        connect_sleep_fall(connect_sleep_queue, connect_stat);
     } else {
         sprintf(logbuf, "%d 号连接已主动断开.", connect_stat->fd);
         bzero(connect_stat, sizeof(struct connect_stat_t)); // 清空状态

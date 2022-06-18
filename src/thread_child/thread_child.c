@@ -12,7 +12,7 @@ void *thread_child_handle(void *args) {
     pthread_mutex_lock(&thread_resource->mutex);
     while (1) {
         // 尝试出队, 注意此时锁处于上锁状态
-        struct queue_elem_t elem;
+        struct thread_task_queue_elem_t elem;
         ret = queue_out(thread_resource->queue, &elem);
         if (-1 == ret) {
             // 出队失败, 此时队列为空, 则在条件变量上等待

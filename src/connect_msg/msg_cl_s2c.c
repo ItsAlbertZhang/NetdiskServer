@@ -75,7 +75,7 @@ int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *progr
         RET_CHECK_BLACKLIST(-1, ret, "libmysql_query_1col");
 
         // 入队. (队列为线程资源队列, 用于存放待子线程处理的请求.)
-        struct queue_elem_t elem;
+        struct thread_task_queue_elem_t elem;
         elem.flag = QUEUE_FLAG_S2C;
         elem.connect_fd = connect_stat->fd;
         strcpy(elem.file_md5, filemd5);

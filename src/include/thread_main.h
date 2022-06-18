@@ -30,35 +30,22 @@ struct connect_timer_hashnode {
 };
 
 // 休眠连接状态
-struct connect_sleep_t {
+struct connect_sleep_queue_elem_t {
     struct sockaddr_in addr; // 存放连接对端的地址信息
     char token[64];          // 连接的 token
     int userid;              // 用户 id
     int pwd_id;              // 当前工作目录 id
 };
 
-// 休眠连接链表数据内容
-union connect_sleep_nodedata {
-    struct connect_sleep_t conn;
-    int len;
-};
-
-// 休眠连接链表
-struct connect_sleep_node {
-    union connect_sleep_nodedata data;
-    struct connect_sleep_node *next;
-};
-
 extern int epfd;
 
 // 消息来源为已有连接
-int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct program_stat_t *program_stat, struct connect_sleep_node *connect_sleep);
-
+int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct program_stat_t *program_stat, struct queue_t *connect_sleep_queue);
 // 消息来源为 socket_fd, 有新连接
 int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr);
 
 // 销毁连接
-int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct connect_sleep_node *connect_sleep, int gotosleep);
+int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct queue_t *connect_sleep_queue, int gotosleep);
 
 // 将新连接放入时间轮定时器
 int connect_timer_in(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr);
@@ -70,21 +57,14 @@ int connect_timer_out(struct connect_stat_t *connect_stat, struct connect_timer_
 int connect_timer_move(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr);
 
 // 处理下一秒对应的时间轮片上的连接
-int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr, struct connect_sleep_node *connect_sleep);
-
+int connect_timer_handle(struct connect_timer_hashnode *connect_timer_arr, struct queue_t *connect_sleep_queue);
 // 将连接应在的位置更新至连接状态
 int connect_timer_update(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr);
 
-// 初始化休眠连接链表
-struct connect_sleep_node *connect_sleep_init(void);
-
-// 销毁休眠连接链表
-void connect_sleep_destory(struct connect_sleep_node *headnode);
-
 // 将现有连接中的信息添加入休眠连接链表
-int connect_sleep_fall(struct connect_sleep_node *headnode, struct connect_stat_t *connect_stat);
+int connect_sleep_fall(struct queue_t *connect_sleep_queue, struct connect_stat_t *connect_stat);
 
 // 取出休眠连接链表中的信息并填入现有连接
-int connect_sleep_awake(struct connect_sleep_node *headnode, char *token_plain, struct connect_stat_t *connect_stat);
+int connect_sleep_awake(struct queue_t *connect_sleep_queue, char *token_plain, struct connect_stat_t *connect_stat);
 
 #endif
