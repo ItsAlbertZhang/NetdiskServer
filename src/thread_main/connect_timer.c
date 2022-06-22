@@ -23,22 +23,28 @@ int connect_timer_in(struct connect_stat_t *connect_stat, struct connect_timer_h
 }
 
 int connect_timer_out(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr) {
-    // 获取连接所在的时间轮定时器结点和其前驱结点
-    struct connect_timer_hashnode *prenode = &connect_timer_arr[connect_stat->connect_timer_index];
-    while (prenode->next->data.conn != connect_stat) {
-        prenode = prenode->next;
-        if (NULL == prenode) {
-            return -1;
+    // 当该连接在时间轮定时器上时, 方可取出
+    if (-1 != connect_stat->connect_timer_index) {
+        // 获取连接所在的时间轮定时器结点和其前驱结点
+        struct connect_timer_hashnode *prenode = &connect_timer_arr[connect_stat->connect_timer_index];
+        while (prenode->next->data.conn != connect_stat) {
+            prenode = prenode->next;
+            if (NULL == prenode) {
+                return -1;
+            }
         }
+        struct connect_timer_hashnode *thisnode = prenode->next;
+        // 将连接所在的结点移开
+        prenode->next = thisnode->next;
+        connect_timer_arr[connect_stat->connect_timer_index].data.len -= 1;
+        // 删除结点并释放内存, 并修改连接信息
+        free(thisnode);
+        connect_stat->connect_timer_index = -1;
+        connect_stat->connect_timer_real = -1;
+        // 打印日志
+        sprintf(logbuf, "已将 %d 号连接从时间轮计时器上取出.", connect_stat->fd);
+        logging(LOG_DEBUG, logbuf);
     }
-    struct connect_timer_hashnode *thisnode = prenode->next;
-    // 将连接所在的结点移开
-    prenode->next = thisnode->next;
-    connect_timer_arr[connect_stat->connect_timer_index].data.len -= 1;
-    // 删除结点并释放内存
-    free(thisnode);
-    sprintf(logbuf, "已将 %d 号连接从时间轮计时器上取出.", connect_stat->fd);
-    logging(LOG_DEBUG, logbuf);
 
     return 0;
 }

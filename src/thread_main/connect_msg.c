@@ -15,6 +15,7 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
         // 对方已断开连接
         ret = connect_destory(connect_stat, connect_timer_arr, connect_sleep_queue, 0);
         RET_CHECK_BLACKLIST(-1, ret, "connect_destory");
+        return 0;
     }
 
     switch (buf[0]) {

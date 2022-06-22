@@ -46,8 +46,11 @@ int thread_main_handle(struct program_stat_t *program_stat) {
                 int connect_fd = -1;
                 ret = read(program_stat->thread_stat.thread_resource.pipe_fd[0], &connect_fd, sizeof(connect_fd));
                 RET_CHECK_BLACKLIST(-1, ret, "read");
-                ret = connect_timer_in(&connect_stat_arr[connect_fd % program_stat->thread_stat.max_connect_num], connect_timer_arr);
-                RET_CHECK_BLACKLIST(-1, ret, "connect_timer_in");
+                // 如果连接此时还没有断开
+                if (connect_stat_arr[connect_fd % program_stat->thread_stat.max_connect_num].fd) {
+                    ret = connect_timer_in(&connect_stat_arr[connect_fd % program_stat->thread_stat.max_connect_num], connect_timer_arr);
+                    RET_CHECK_BLACKLIST(-1, ret, "connect_timer_in");
+                }
             }
             // 有来自 socket_fd 的消息 (新连接)
             else if (events[i].data.fd == program_stat->socket_fd) {

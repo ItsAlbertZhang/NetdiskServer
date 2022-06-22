@@ -52,9 +52,10 @@ int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_ha
         connect_sleep_fall(connect_sleep_queue, connect_stat);
     } else {
         sprintf(logbuf, "%d 号连接已主动断开.", connect_stat->fd);
-        bzero(connect_stat, sizeof(struct connect_stat_t)); // 清空状态
         logging(LOG_INFO, logbuf);
     }
+
+    bzero(connect_stat, sizeof(struct connect_stat_t));
 
     return 0;
 }
