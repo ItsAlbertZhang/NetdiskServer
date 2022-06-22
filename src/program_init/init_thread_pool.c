@@ -16,13 +16,24 @@ int init_pthread_pool(struct thread_stat_t *thread_stat, const char *config_dir,
     thread_stat->max_connect_num = thread_stat->pth_num * 2 + atoi(config[1]);          // 见该结构体成员的注释
     thread_stat->pthid = (pthread_t *)malloc(sizeof(pthread_t) * thread_stat->pth_num); // 初始化线程 id 数组
     // 初始化线程资源
-    queue_init(&thread_stat->thread_resource.queue, sizeof(struct thread_task_queue_elem_t), atoi(config[1])); // 初始化任务队列
-    pipe(thread_stat->thread_resource.pipe_fd);                                                                // 初始化管道
-    pthread_mutex_init(&thread_stat->thread_resource.mutex, NULL);                                             // 初始化线程锁
-    pthread_cond_init(&thread_stat->thread_resource.cond, NULL);                                               // 初始化条件变量
+    queue_init(&thread_stat->thread_resource.task_queue, sizeof(struct thread_task_queue_elem_t), atoi(config[1])); // 初始化任务队列
+    pipe(thread_stat->thread_resource.pipe_fd);                                                                     // 初始化管道
+    pthread_mutex_init(&thread_stat->thread_resource.mutex, NULL);                                                  // 初始化线程锁
+    pthread_cond_init(&thread_stat->thread_resource.cond, NULL);                                                    // 初始化条件变量
     // 初始化文件池所在目录
     strncpy(thread_stat->thread_resource.filepool_dir, config_dir, strlen(config_dir) - strlen("config/"));
     strcat(thread_stat->thread_resource.filepool_dir, "file/");
+    // 初始化子线程独占资源
+    queue_init(&thread_stat->thread_resource.exclusive_resources_queue, sizeof(struct thread_exclusive_resources_queue_elem_t), atoi(config[0]));
+    struct thread_exclusive_resources_queue_elem_t elem;
+    for (int i = 0; i < atoi(config[0]); i++) {
+        bzero(&elem.progress_bar, sizeof(struct progress_bar_t));
+        ret = pipe(elem.pipefd);
+        RET_CHECK_BLACKLIST(-1, ret, "pipe");
+        queue_in(thread_stat->thread_resource.exclusive_resources_queue, &elem);
+    }
+    // 初始化进度条
+    queue_init(&thread_stat->thread_resource.progress_bar_queue, sizeof(struct progress_bar_t), atoi(config[0]));
 
     // 拉起子线程
     for (int i = 0; i < thread_stat->pth_num; i++) {

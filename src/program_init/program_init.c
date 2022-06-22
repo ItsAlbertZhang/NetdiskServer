@@ -29,7 +29,7 @@ int program_init(struct program_stat_t *program_stat) {
     logging(LOG_INFO, "成功初始化线程池.");
 
     // 初始化 tcp
-    program_stat->socket_fd = init_tcp(program_stat->local_sign, program_stat->thread_stat.thread_resource.queue->len, config_dir, config);
+    program_stat->socket_fd = init_tcp(program_stat->local_sign, program_stat->thread_stat.thread_resource.task_queue->len, config_dir, config);
     RET_CHECK_BLACKLIST(-1, program_stat->socket_fd, "init_tcp");
     logging(LOG_INFO, "成功初始化 tcp.");
 
