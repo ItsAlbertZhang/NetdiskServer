@@ -27,13 +27,13 @@ int init_pthread_pool(struct thread_stat_t *thread_stat, const char *config_dir,
     queue_init(&thread_stat->thread_resource.exclusive_resources_queue, sizeof(struct thread_exclusive_resources_queue_elem_t), atoi(config[0]));
     struct thread_exclusive_resources_queue_elem_t elem;
     for (int i = 0; i < atoi(config[0]); i++) {
-        bzero(&elem.progress_bar, sizeof(struct progress_bar_t));
+        bzero(&elem.progress_bar, sizeof(struct progress_t));
         ret = pipe(elem.pipefd);
         RET_CHECK_BLACKLIST(-1, ret, "pipe");
         queue_in(thread_stat->thread_resource.exclusive_resources_queue, &elem);
     }
     // 初始化进度条
-    queue_init(&thread_stat->thread_resource.progress_bar_queue, sizeof(struct progress_bar_t), atoi(config[0]));
+    queue_init(&thread_stat->thread_resource.progress_queue, sizeof(struct progress_t *), atoi(config[0]));
 
     // 拉起子线程
     for (int i = 0; i < thread_stat->pth_num; i++) {

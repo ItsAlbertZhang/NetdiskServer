@@ -153,3 +153,23 @@ int connect_msg_fetchtype(int connect_fd, void *buf) {
     ret = recv_n(connect_fd, buf, 1, 0);
     return ret;
 }
+
+int stdin_msg_handle(struct program_stat_t *program_stat) {
+    int ret = 0;
+    char cmd[1024] = {0};
+    read(STDIN_FILENO, cmd, sizeof(cmd));
+    int cmdtype = stdin_msg_cmdtype(cmd);
+    switch (cmdtype) {
+    case MT_LOCAL_PROGRESS:
+        ret = local_progress(program_stat);
+        break;
+    }
+}
+
+int stdin_msg_cmdtype(char *cmd) {
+    int ret = 0;
+    if (!strncmp(cmd, "showpg", strlen("showpg"))) {
+        return MT_LOCAL_PROGRESS;
+    }
+    return 0;
+}

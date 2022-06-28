@@ -34,6 +34,7 @@
 #include <openssl/md5.h>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
+#include <termio.h>
 #include <time.h>
 #include <unistd.h>
 

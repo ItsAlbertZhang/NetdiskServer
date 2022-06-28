@@ -44,6 +44,10 @@ int connect_msg_handle(struct connect_stat_t *connect_stat, struct connect_timer
 // 消息来源为 socket_fd, 有新连接
 int connect_init_handle(int socket_fd, struct connect_stat_t *connect_stat_arr, int max_connect_num, struct connect_timer_hashnode *connect_timer_arr);
 
+// 消息来源为 stdin
+int stdin_msg_handle(struct program_stat_t *program_stat);
+int stdin_msg_cmdtype(char *cmd);
+
 // 销毁连接
 int connect_destory(struct connect_stat_t *connect_stat, struct connect_timer_hashnode *connect_timer_arr, struct queue_t *connect_sleep_queue, int gotosleep);
 

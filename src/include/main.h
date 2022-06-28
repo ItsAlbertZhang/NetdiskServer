@@ -3,19 +3,26 @@
 
 #include "head.h"
 #include "mylibrary.h"
-#include "progress_bar.h"
+
+struct progress_t {
+    size_t filesize;
+    size_t completedsize;
+    size_t lastsize;
+    time_t starttime;
+    char file_md5[64];
+};
 
 // 子线程互斥资源
 struct thread_exclusive_resources_queue_elem_t {
-    struct progress_bar_t progress_bar; // 用于进度条
-    int pipefd[2];                      // 用于 splice
+    struct progress_t progress_bar; // 用于进度条
+    int pipefd[2];                  // 用于 splice
 };
 
 // 子线程共用资源
 struct thread_resource_t {
     struct queue_t *task_queue;                // 任务队列 (主线程结合任务队列与条件变量向子线程发送消息)
     struct queue_t *exclusive_resources_queue; // 每个子线程的独占资源队列, 元素 struct thread_exclusive_resources_queue_elem_t
-    struct queue_t *progress_bar_queue;        // 进度条队列, 元素 struct progress_bar_t
+    struct queue_t *progress_queue;            // 进度条队列, 元素 struct progress_t * (之所以采用指针, 是为了方便在主线程访问)
     int pipe_fd[2];                            // 管道 (子线程通过管道向主线程发送消息)
     pthread_mutex_t mutex;                     // 线程锁, 加解锁后方可对队列进行操作
     pthread_cond_t cond;                       // 子线程等待所在的条件变量
@@ -73,6 +80,8 @@ enum log_type {
     LOG_WARN,
     LOG_ERROR,
     LOG_FATAL,
+    LOG_INPUT,
+    LOG_OUTPUT,
 };
 
 int program_init(struct program_stat_t *program_stat);

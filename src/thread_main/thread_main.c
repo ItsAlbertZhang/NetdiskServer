@@ -30,34 +30,44 @@ int thread_main_handle(struct program_stat_t *program_stat) {
     // 将 socket_fd 添加至 epoll 监听
     ret = epoll_add(program_stat->socket_fd);
     RET_CHECK_BLACKLIST(-1, ret, "epoll_add");
-    // malloc 结构体数组: 返回的监听结果 struct epoll_event; 数组的成员个数为最大连接数 + 1 (除了要监听连接之外, 还要监听子线程管道和 socket)
-    struct epoll_event *events = (struct epoll_event *)malloc(sizeof(struct epoll_event) * (program_stat->thread_stat.max_connect_num + 2));
-    bzero(events, sizeof(struct epoll_event) * (program_stat->thread_stat.max_connect_num + 2));
+    // 将 stdin 添加至 epoll 监听
+    ret = epoll_add(STDIN_FILENO);
+    RET_CHECK_BLACKLIST(-1, ret, "epoll_add");
+    // malloc 结构体数组: 返回的监听结果 struct epoll_event; 数组的成员个数为最大连接数 + 3 (除了要监听连接之外, 还要监听子线程管道和 socket)
+    struct epoll_event *events = (struct epoll_event *)malloc(sizeof(struct epoll_event) * (program_stat->thread_stat.max_connect_num + 3));
+    bzero(events, sizeof(struct epoll_event) * (program_stat->thread_stat.max_connect_num + 3));
     int ep_ready = 0; // 有消息来流的监听个数
 
     char program_running_flag = 1; // 程序继续运行标志
     while (program_running_flag) {
-        ep_ready = epoll_wait(epfd, events, (program_stat->thread_stat.max_connect_num + 2), 1000); // 进行 epoll 多路监听, 至多监听 1 秒.
+        ep_ready = epoll_wait(epfd, events, (program_stat->thread_stat.max_connect_num + 3), 1000); // 进行 epoll 多路监听, 至多监听 1 秒.
         RET_CHECK_BLACKLIST(-1, ep_ready, "epoll_wait");
         for (int i = 0; i < ep_ready; i++) {
+            // 有来自 STDIN 的消息
+            if (events[i].data.fd == STDIN_FILENO) {
+                ret = stdin_msg_handle(program_stat);
+                RET_CHECK_BLACKLIST(-1, ret, "connect_sendmsg_handle");
+            }
             // 有来自子线程的消息, 有任务完成
-            if (events[i].data.fd == program_stat->thread_stat.thread_resource.pipe_fd[0]) {
+            else if (events[i].data.fd == program_stat->thread_stat.thread_resource.pipe_fd[0]) {
                 // 将该任务对应的连接重新加入时间轮定时器 (取出见 msg_cl_ 函数族)
                 int connect_fd = -1;
                 ret = read(program_stat->thread_stat.thread_resource.pipe_fd[0], &connect_fd, sizeof(connect_fd));
                 RET_CHECK_BLACKLIST(-1, ret, "read");
-                // 如果连接此时还没有断开
+                // 如果客户端还未主动断开
                 if (connect_stat_arr[connect_fd % program_stat->thread_stat.max_connect_num].fd) {
                     ret = connect_timer_in(&connect_stat_arr[connect_fd % program_stat->thread_stat.max_connect_num], connect_timer_arr);
                     RET_CHECK_BLACKLIST(-1, ret, "connect_timer_in");
                 }
+                sprintf(logbuf, "与 %d 号连接的任务完成.", connect_stat_arr[connect_fd % program_stat->thread_stat.max_connect_num].fd);
+                logging(LOG_INFO, logbuf);
             }
             // 有来自 socket_fd 的消息 (新连接)
             else if (events[i].data.fd == program_stat->socket_fd) {
                 ret = connect_init_handle(program_stat->socket_fd, connect_stat_arr, program_stat->thread_stat.max_connect_num, connect_timer_arr);
                 RET_CHECK_BLACKLIST(-1, ret, "connect_init_handle");
             }
-            //  有来自已有连接的消息
+            // 有来自已有连接的消息
             else {
                 // 处理消息
                 ret = connect_msg_handle(&connect_stat_arr[events[i].data.fd % program_stat->thread_stat.max_connect_num], connect_timer_arr, program_stat, connect_sleep_qp);

@@ -7,22 +7,23 @@
 
 // 消息类型标志
 enum msg_type {
-    MT_NULL,     // 编号 0 为空请求
-    MT_CONNINIT, // 下发验证请求
-    MT_REGIST,   // 注册请求
-    MT_LOGIN,    // 登录请求
-    MT_DUPCONN,  // 拷贝连接请求
-    MT_CS_PWD,   // 短命令(command short): pwd
-    MT_CS_LS,    // 短命令(command short): ls
-    MT_CS_CD,    // 短命令(command short): cd
-    MT_CS_RM,    // 短命令(command short): rm
-    MT_CS_MV,    // 短命令(command short): mv
-    MT_CS_CP,    // 短命令(command short): cp
-    MT_CS_MKDIR, // 短命令(command short): mkdir
-    MT_CS_RMDIR, // 短命令(command short): rmdir
-    MT_CL_S2C,   // 长命令(command long): server to client (download)
-    MT_COMM_S,   // 短命令请求
-    MT_COMM_L,   // 长命令请求
+    MT_NULL,           // 编号 0 为空请求
+    MT_CONNINIT,       // 下发验证请求
+    MT_REGIST,         // 注册请求
+    MT_LOGIN,          // 登录请求
+    MT_DUPCONN,        // 拷贝连接请求
+    MT_CS_PWD,         // 短命令(command short): pwd
+    MT_CS_LS,          // 短命令(command short): ls
+    MT_CS_CD,          // 短命令(command short): cd
+    MT_CS_RM,          // 短命令(command short): rm
+    MT_CS_MV,          // 短命令(command short): mv
+    MT_CS_CP,          // 短命令(command short): cp
+    MT_CS_MKDIR,       // 短命令(command short): mkdir
+    MT_CS_RMDIR,       // 短命令(command short): rmdir
+    MT_CL_S2C,         // 长命令(command long): server to client (download)
+    MT_LOCAL_PROGRESS, // 本地命令: 查看进度
+    MT_COMM_S,         // 短命令请求
+    MT_COMM_L,         // 长命令请求
 };
 
 // 循环接收, 避免因网络数据分包导致的错误
@@ -75,5 +76,8 @@ int msg_cs_rmdir(struct connect_stat_t *connect_stat, struct program_stat_t *pro
 
 // download 命令请求
 int msg_cl_s2c(struct connect_stat_t *connect_stat, struct program_stat_t *program_stat, struct connect_timer_hashnode *connect_timer_arr);
+
+// 查看进度命令
+int local_progress(struct program_stat_t *program_stat);
 
 #endif /* __CONNECT_MSG_H__ */
